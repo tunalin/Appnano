@@ -303,7 +303,7 @@ const styles=StyleSheet.create({
     renderview2:{ alignItems: 'center', flexDirection: 'row', marginVertical: 5 },
     rendertextten:{ fontSize: 16, fontWeight: '500', color: '#000', padding: 5 },
     rendertextsdt:{ fontSize: 13, fontWeight: '500', color: '#BFBFBF', padding: 5 },
-    rendersaleview:{ width: 116, height: 145, borderRadius: 15, elevation: 4, backgroundColor: '#fff' },
+    rendersaleview:{ width: 116, height: 135, borderRadius: 15, elevation: 4, backgroundColor: '#fff' },
     rendersaletextgoi:{fontSize:12,fontWeight:'500',textAlign:'center',padding:5 },
     rendersale2v:{ width: 366, height: 64, borderRadius: 5, backgroundColor: '#fff', elevation: 3, padding: 5, marginHorizontal: 20, borderWidth: 0.3 },
     rendersale2v1:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 20 },
