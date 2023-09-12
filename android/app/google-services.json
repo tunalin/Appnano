@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "102206298086",
+    "project_id": "appnano-ce514",
+    "storage_bucket": "appnano-ce514.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:102206298086:android:b0602c14e6f1e41453a827",
+        "android_client_info": {
+          "package_name": "com.appnano"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrr4SgxRdGeodry-30r-wEXEcA6-sy11Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
