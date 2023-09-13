@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
@@ -34,18 +34,10 @@ import NPPhoi from "./screen/danhsachnhom/DSNhom";
 import HomeKho from "./screen/home/HomeKho";
 import ChuaDangNhap from "./screen/chuadangnhap/ChuaDangNhap";
 
-
-
-
-
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
-    useEffect(() => {
-        SplashScreen.hide();
-    },[])
-
     return (
         <>
             <NavigationContainer>
