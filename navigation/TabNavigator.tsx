@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import React from "react";
+import React, { useEffect } from "react";
 import NhaCungCap from "../screen/nhaCungCap/NhaCungCap";
 import Khodiem from "../screen/khoDoiDiem/Khodiem";
 import Account from "../screen/menutaikhoan/Account";
@@ -7,12 +7,18 @@ import { Animated, Image, StyleSheet, View } from "react-native";
 import DonHng from "../screen/donHang/DonHng";
 import ChuaDangNhap from "../screen/chuadangnhap/ChuaDangNhap";
 import HomeKho from "../screen/home/HomeKho";
+import SplashScreen from "react-native-splash-screen";
 
 const Tab = createBottomTabNavigator();
 
 
 
 const TabNavigator = () => {
+
+    useEffect(()=>{
+        SplashScreen.hide();
+    },[])
+
     return (
         <Tab.Navigator screenOptions={{ headerShown: false, tabBarStyle:{ backgroundColor: '#005AA9', height:60}, tabBarLabelStyle: { color: '#fff' } }}>
             <Tab.Screen name="Home" component={HomeKho} options={{
