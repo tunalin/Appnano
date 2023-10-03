@@ -33,8 +33,10 @@ import SplashScreen from "react-native-splash-screen";
 import NPPhoi from "./screen/danhsachnhom/DSNhom";
 import HomeKho from "./screen/home/HomeKho";
 import ChuaDangNhap from "./screen/chuadangnhap/ChuaDangNhap";
+import Timkiem from "./screen/Timkiem/Timkiem";
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -42,7 +44,7 @@ const App = () => {
 
     
     return (
-        <>
+   
             <NavigationContainer>
                 <Stack.Navigator>
                     <Stack.Screen name="home" component={BottomTab} options={{ headerShown: false }} />
@@ -71,10 +73,10 @@ const App = () => {
                     <Stack.Screen name="vitien2" component={ViChinh2} options={{ headerShown: false }} />
                     <Stack.Screen name="danhsachnhom1" component={NPPhoi} options={{ headerShown: false }} />
                     <Stack.Screen name="home1" component={HomeKho} options={{ headerShown: false }} />
-                    
+                    <Stack.Screen name="timkiem" component={Timkiem} options={{ headerShown: false }} />
                 </Stack.Navigator>
             </NavigationContainer>
-        </>
+  
     );
 };
 export default App;

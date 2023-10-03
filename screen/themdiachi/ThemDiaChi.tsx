@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Image ,StyleSheet} from 'react-native'
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 
 const ThemDiaChi = ({ navigation }: any) => {
@@ -73,29 +73,29 @@ const ThemDiaChi = ({ navigation }: any) => {
             <View style={styles.view10}>
                 <Text style={styles.text4}>Cập nhật</Text>
             </View>
-            
+
         </View>
     );
 };
 
-const styles=StyleSheet.create({
-    container:{ flex: 1, width: 414, height: 869, backgroundColor: '#fff' },
-    top:{ flexDirection: 'row', alignItems: 'center', marginTop: 20, marginLeft: 20 },
-    text:{ fontSize: 20, fontWeight: '500', color: '#005aa9', marginLeft: 110 },
-    text1:{ fontSize: 16, fontWeight: '500', color: '#000' },
-    text2:{ fontSize: 13, fontWeight: '500', color: '#000' },
-    text3:{ fontSize: 13, fontWeight: '400', color: '#c4c4c4' },
-    view:{ marginTop: 30, marginLeft: 20 },
-    view1:{ marginTop: 15, marginLeft: 20 },
-    view2:{ width: 370, height: 78, borderRadius: 7, borderColor: '#c2c2c2', borderWidth: 1 },
-    view3:{ paddingVertical: 15, marginLeft: 15 },
-    view4:{ marginTop: 10, marginLeft: 20 },
-    view5:{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 40, marginTop: 15 },
-    view6:{ width: 342, justifyContent: 'center', alignItems: 'center', borderColor: '#c4c4c2', borderWidth: 0.3, marginLeft: 40, marginTop: 15 },
-    view7:{marginTop:15,marginLeft:40},
-    view8:{ marginTop: 20, marginLeft: 20 },
-    view9:{ flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, marginTop: 15 },
-    touch:{
+const styles = StyleSheet.create({
+    container: { flex: 1, width: '100%', height: 869, backgroundColor: '#fff' ,marginRight:20},
+    top: { flexDirection: 'row', alignItems: 'center', marginTop: 20, marginLeft: 20 },
+    text: { fontSize: 20, fontWeight: '500', color: '#005aa9', marginLeft: 110 },
+    text1: { fontSize: 16, fontWeight: '500', color: '#000' },
+    text2: { fontSize: 13, fontWeight: '500', color: '#000' },
+    text3: { fontSize: 13, fontWeight: '400', color: '#c4c4c4' },
+    view: { marginTop: 30, marginLeft: 20 },
+    view1: { marginTop: 15, marginLeft: 10 },
+    view2: { width: 370, height: 78, borderRadius: 7, borderColor: '#c2c2c2', borderWidth: 1 },
+    view3: { paddingVertical: 15, marginLeft: 15 },
+    view4: { marginTop: 10, marginLeft: 10},
+    view5: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 40, marginTop: 15 },
+    view6: { width: 342, justifyContent: 'center', alignItems: 'center', borderColor: '#c4c4c2', borderWidth: 0.3, marginLeft: 40, marginTop: 15 },
+    view7: { marginTop: 15, marginLeft: 40 },
+    view8: { marginTop: 20, marginLeft: 20 },
+    view9: { flexDirection: 'row', justifyContent: 'space-between', marginHorizontal: 20, marginTop: 15 },
+    touch: {
         width: 109,
         height: 33,
         borderWidth: 0.3,
@@ -105,7 +105,7 @@ const styles=StyleSheet.create({
         alignItems: 'center',
 
     },
-    touch1:{
+    touch1: {
         width: 109,
         height: 33,
         borderWidth: 0.3,
@@ -115,8 +115,8 @@ const styles=StyleSheet.create({
         alignItems: 'center',
 
     },
-    view10:{ width: 326, height: 52, borderRadius: 7, backgroundColor: '#005aa9', justifyContent: 'center', alignItems: 'center', marginHorizontal: 43, marginTop:250},
-    text4:{ fontSize: 16, fontWeight: '500', color: '#fff' }
+    view10: { width: 326, height: 52, borderRadius: 7, backgroundColor: '#005aa9', justifyContent: 'center', alignItems: 'center', marginHorizontal: 35 ,marginTop:35},
+    text4: { fontSize: 16, fontWeight: '500', color: '#fff' }
 })
 
 export default ThemDiaChi

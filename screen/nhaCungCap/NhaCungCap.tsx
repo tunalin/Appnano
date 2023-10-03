@@ -90,7 +90,8 @@ const NhaCungCap = () => {
                 <FlatList
                     data={data}
                     keyExtractor={(item) => item.id}
-                    renderItem={renderIcon} />
+                    renderItem={renderIcon} 
+                    showsVerticalScrollIndicator={false}/>
             </View>
 
 
@@ -100,7 +101,7 @@ const NhaCungCap = () => {
     )
 }
 const styles = StyleSheet.create({
-    view:{ borderRadius: 7, borderColor: '#c2c2c2', borderWidth: 1, height: 106, width: 382, paddingVertical: 5,margin:5,marginHorizontal:10},
+    view:{ borderRadius: 7, borderColor: '#c2c2c2', borderWidth: 1, height: 106, width: 365, paddingVertical: 5,margin:5,},
     top:{ flexDirection: 'row', paddingHorizontal:5,paddingVertical:5 },
     view1:{ flexDirection: 'column', paddingVertical: 15,paddingHorizontal:15},
     img:{ width: 64, height: 60 },
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     text3:{ color: '#000', fontSize: 13, fontWeight: '300' },
     container:{ flex: 1, width: '100%', height: 896, backgroundColor: '#fff' },
     text4:{ fontSize: 20, fontWeight: '500', color: '#005aa9', textAlign: 'center' },
-    view4:{ marginHorizontal: 15, marginVertical: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+    view4:{ marginHorizontal: 10, marginVertical: 15, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     view5:{ borderWidth: 1, borderColor: "#c2c2c2", borderStyle: "solid", borderRadius: 7, backgroundColor: '#fff', width: 345, height: 46, justifyContent: 'space-between', alignItems: 'center', flexDirection: 'row', paddingHorizontal: 20 },
     text5:{ color: "#c2c2c2", fontSize: 16, fontWeight: '500', textAlign: 'left' },
     img1:{ height: 23, width: 23 },

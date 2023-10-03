@@ -185,10 +185,10 @@ const styles=StyleSheet.create({
     view6:{ flexDirection: 'row', justifyContent: 'space-around', marginBottom: 15 },
     view7:{ marginTop: 20, marginLeft: 16 },
     view8:{ marginLeft: 110, marginTop: 20 },
-    view9:{ marginLeft: 15, marginTop: 18 },
+    view9:{ marginLeft: 25, marginTop: 18,right:25 },
     text5:{ fontSize: 13, fontWeight: "400", color: '#000' },
     text6:{ fontSize: 16, fontWeight: "500", color: '#000' },
-    view10:{ justifyContent: 'center', alignItems: 'center', width: 382, height: 52, borderRadius: 7, backgroundColor: '#005aa9', left: 15, marginBottom: 10 },
+    view10:{ justifyContent: 'center', alignItems: 'center', width: 370, height: 52, borderRadius: 7, backgroundColor: '#005aa9', left: 15, marginBottom: 10 },
     view11:{ flexDirection: 'row', alignItems: 'center', justifyContent: "center" }
 })
 

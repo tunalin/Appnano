@@ -136,7 +136,7 @@ const TaoDonHang = ({ navigation }: any) => {
 }
 
 const styles=StyleSheet.create({
-    container:{ width: '100%', height: 1064, backgroundColor:'#fff'},
+    container:{ flex:1, height: 1064, backgroundColor:'#fff',right:10},
     top:{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', marginTop: 30 },
     img:{ width: 20, right: 50 },
     text:{ fontSize: 20, fontWeight: '500', color: '#005aa9', right: 70 },

@@ -126,7 +126,7 @@ const NPPhoi = ({ navigation }: any) => {
         
         const textColor = textColors[index % textColors.length];
         return (
-            <View style={{ padding: 10, }}>
+            <View style={{ padding: 8, }}>
                 <View style={styles.rendersaleview}>
                     <View style={styles.rendersale1v}>
                         <Image source={item.hinh} />
@@ -297,7 +297,7 @@ const NPPhoi = ({ navigation }: any) => {
 }
 
 const styles=StyleSheet.create({
-    renderview:{ width: 382, height: 75, borderRadius: 10, borderWidth: 0.3, borderColor: '#c2c2c2', marginHorizontal: 20, margin: 5 },
+    renderview:{ width: 370, height: 75, borderRadius: 10, borderWidth: 0.3, borderColor: '#c2c2c2', marginHorizontal: 10, margin: 5 },
     renderhuong:{ flexDirection: 'row', justifyContent: 'space-around' },
     rendersale1v:{ flexDirection: 'column', alignItems: 'center', marginHorizontal: 20, marginTop: 20 },
     renderview2:{ alignItems: 'center', flexDirection: 'row', marginVertical: 5 },
@@ -305,17 +305,17 @@ const styles=StyleSheet.create({
     rendertextsdt:{ fontSize: 13, fontWeight: '500', color: '#BFBFBF', padding: 5 },
     rendersaleview:{ width: 116, height: 135, borderRadius: 15, elevation: 4, backgroundColor: '#fff' },
     rendersaletextgoi:{fontSize:12,fontWeight:'500',textAlign:'center',padding:5 },
-    rendersale2v:{ width: 366, height: 64, borderRadius: 5, backgroundColor: '#fff', elevation: 3, padding: 5, marginHorizontal: 20, borderWidth: 0.3 },
+    rendersale2v:{ width: 366, height: 64, borderRadius: 5, backgroundColor: '#fff', elevation: 3, padding: 5, marginHorizontal: 8, borderWidth: 0.3 },
     rendersale2v1:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginHorizontal: 20 },
     rendersalev3:{ alignItems: 'flex-start', justifyContent: 'flex-start', marginRight: 70 },
     rendersale2t:{ fontSize: 14, fontWeight: '500', color: '#000', padding: 5 },
     rendersale2t1:{ fontSize: 10, fontWeight: '400', color: '#8B8787', padding: 5 },
     point:{ fontSize: 14, fontWeight: '500', color: '#09355C' },
-    view:{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 20, marginVertical: 15 },
+    view:{ flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 25, marginVertical: 15 },
     view2:{ fontSize: 15, fontWeight: '500', color: '#000' },
     huong:{ flexDirection: 'row', alignItems: 'center' },
-    textt1:{ fontSize: 13, fontWeight: '400', color: '#005aa9' },
-    vls:{ width: 382, height: 92, borderRadius: 5, backgroundColor: '#fff', elevation: 4, borderWidth: 0.3, marginHorizontal: 17, marginVertical: 15 },
+    textt1:{ fontSize: 13, fontWeight: '400', color: '#005aa9' ,},
+    vls:{ width: 382, height: 92, borderRadius: 5, backgroundColor: '#fff', elevation: 4, borderWidth: 0.3, marginHorizontal: 7, marginVertical: 7 },
     huong2:{marginHorizontal:15,marginVertical:5},
     text1:{ fontSize: 14, fontWeight: '500', color: '#000' },
     huong3:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
@@ -325,7 +325,7 @@ const styles=StyleSheet.create({
     container:{ width: 414, height: 896, backgroundColor: '#fff' },
     top:{ flexDirection: 'row', alignItems: 'center', marginTop: 20, marginLeft: 20 },
     textdn:{ fontSize: 20, fontWeight: '500', color: '#005aa9', marginLeft: 130 },
-    view3:{ width: 389, height: 42, backgroundColor: '#f1f1f1', marginHorizontal: 15, marginTop: 15, borderRadius: 35 },
+    view3:{ width: 389, height: 42, backgroundColor: '#f1f1f1', marginHorizontal: 3, marginTop: 15, borderRadius: 35 },
     huong5:{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     
 })  

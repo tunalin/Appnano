@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
         borderRadius: 7,
         justifyContent: 'center',
         alignItems: 'center',
-        marginLeft: 45,
+        marginLeft: 35,
         bottom: 7
     },
     textcn: {
@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     },
     viewrender: {
         flexDirection: 'column',
-        marginHorizontal: 30
+        marginHorizontal: 15
     },
     
 })

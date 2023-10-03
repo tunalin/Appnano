@@ -184,7 +184,7 @@ const DiaChiPX = ({ navigation }: any) => {
 };
 
 const styles=StyleSheet.create({
-    container:{ flex: 1, width: 414, height: 896, backgroundColor: '#fff' },
+    container:{ flex: 1, width: 414, height: 896, backgroundColor: '#fff',right:9 },
     view:{ marginTop: 15, marginLeft: 35 },
     view1:{ flexDirection: 'row', justifyContent: 'space-between' },
     text:{ fontSize: 13, fontWeight: '400', color: '#000' },

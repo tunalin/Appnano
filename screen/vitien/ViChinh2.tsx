@@ -83,7 +83,7 @@ const styles=StyleSheet.create({
     container:{ width: 414, height: 896, backgroundColor: '#fff' },
     view2:{ flexDirection: 'row', alignItems: 'center', marginTop: 20, marginLeft: 20 },
     view3:{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 15 },
-    view4:{ width: 414, height: 580, borderRadius: 55, elevation: 6, position: 'absolute', top: 260, backgroundColor: '#fff' },
+    view4:{ width: '100%', height: 580, borderRadius: 55, elevation: 6, position: 'absolute', top: 260, backgroundColor: '#fff' },
     view5:{ borderRadius: 3, backgroundColor: '#d9d9d9', width: 39, height: 5, justifyContent: 'center', alignItems: 'center', borderWidth: 0.5, marginVertical: 30, marginLeft: 190 },
     text1:{ fontSize: 20, fontWeight: '500', color: '#005aa9', marginLeft: 140 },
     text2:{ fontSize: 16, fontWeight: '400', color: '#8b8787' },

@@ -167,7 +167,7 @@ const Account = ({ navigation }: any) => {
 }
 
 const styles=StyleSheet.create({
-    view:{ width: 381, borderRadius: 7, borderColor: '#fff', borderWidth: 1, backgroundColor: '#fff', elevation: 2, marginHorizontal: 15, marginVertical: 5 },
+    view:{ width: 370, borderRadius: 7, borderColor: '#fff', borderWidth: 1, backgroundColor: '#fff', elevation: 2, marginHorizontal: 15, marginVertical: 5 },
     view1:{ flexDirection: 'row', alignItems: 'center', height: 46, marginLeft: 15 },
     text:{ fontSize: 13, fontWeight: '400', fontFamily: 'montserrat', color: '#000', padding: 10 },
     img:{ width: 20, height: 20 },
@@ -192,7 +192,7 @@ const styles=StyleSheet.create({
     view10:{ width: '93%', height: 72, backgroundColor: '#FCB813', borderRadius: 10, borderColor: '#fff', borderWidth: 3, marginVertical: -15 },
     text8:{ fontSize: 13, fontWeight: '500', fontFamily: 'montserrat', color: '#fff', paddingRight: 170 },
     view11:{ width: '93%', height: 100, backgroundColor: '#fff', borderRadius: 10, borderColor: '#fff', borderWidth: 3 },
-    view12:{ justifyContent: 'center', alignItems: 'center', marginTop: 15, height: 939, flex: 1 }
+    view12:{ justifyContent: 'center', alignItems: 'center', marginTop: 15, height: 939, flex: 1,right:5 }
 })
 
 export default Account

@@ -81,7 +81,7 @@ const ThongTinLienHe = ({ navigation }: any) => {
 };
 
 const styles=StyleSheet.create({
-    container:{ flex: 1, width: 414, height: 869, backgroundColor: '#fff' },
+    container:{ flex: 1, width: 414, height: 869, backgroundColor: '#fff',right:7 },
     top:{ flexDirection: 'row', alignItems: 'center', marginTop: 20, marginLeft: 20 },
     text:{ fontSize: 20, fontWeight: '500', color: '#005aa9', marginLeft: 120 },
     view:{ marginTop: 30, marginLeft: 20 },
@@ -120,7 +120,7 @@ const styles=StyleSheet.create({
         alignItems: 'center',
 
     },
-    view9:{ width: 326, height: 52, borderRadius: 7, backgroundColor: '#005aa9', justifyContent: 'center', alignItems: 'center', marginHorizontal: 43, marginTop: 120 },
+    view9:{ width: 326, height: 52, borderRadius: 7, backgroundColor: '#005aa9', justifyContent: 'center', alignItems: 'center', marginHorizontal: 43, marginTop: 25 },
     text8:{ fontSize: 16, fontWeight: '500', color: '#fff' },
     view10:{ width: 326, height: 52, borderRadius: 7, justifyContent: 'center', alignItems: 'center', marginHorizontal: 43, marginTop: 10, borderColor: 'red', borderWidth: 0.5 },
     text9:{ fontSize: 16, fontWeight: '500', color: 'red' }

@@ -93,7 +93,7 @@ const LsRutT = ({ navigation }: any) => {
 }
 
 const styles=StyleSheet.create({
-    view:{ width: 382, height: 106, borderRadius: 7, borderWidth: 1, borderColor: '#c2c2c2', marginTop: 25, marginLeft: 15 },
+    view:{ width: 370, height: 106, borderRadius: 7, borderWidth: 1, borderColor: '#c2c2c2', marginTop: 25, marginLeft: 10 },
     view1:{ flexDirection: 'row', marginTop: 10, marginLeft: 15 },
     view2:{width:350,height:106,paddingHorizontal:25,right:5},
     view3:{ flexDirection: 'row', justifyContent: 'space-between' ,padding:2},

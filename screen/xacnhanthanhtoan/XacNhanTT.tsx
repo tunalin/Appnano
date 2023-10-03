@@ -69,7 +69,7 @@ const XacNhanTT = ({ navigation }: any) => {
                     style={{ width: 31, height: 26 }} />
                 <Text style={styles.text6}>Thanh toán bằng ví điện tử</Text>
             </View>
-            <View style={{ marginLeft: 45, marginVertical: 200 }}>
+            <View style={{ marginLeft: 45, marginVertical:20 }}>
                 <TouchableOpacity onPress={()=>navigation.navigate('thanhtoanthanhcong')}>
                     <View style={styles.view5}>
                         <Text style={styles.text11}>Xác nhận thanh toán</Text>

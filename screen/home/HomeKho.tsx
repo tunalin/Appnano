@@ -1,6 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, View, ScrollView, TouchableOpacity, PanResponder, FlatList, TextInput } from "react-native";
 
+
+
+
+
+
 const img = [
   {
     id: '1',
@@ -158,6 +163,8 @@ const HomeKho = ({ navigation }: any) => {
   const [imagePosition2, setImagePosition2] = useState(0);
   const [activeDotIndex1, setactiveDotIndex1] = useState(0);
   const [activeDotIndex2, setactiveDotIndex2] = useState(0);
+  const [searchKeyword, setSearchKeyword] = useState("");
+
 
   useEffect(() => {
     const time = setInterval(() => {
@@ -172,6 +179,8 @@ const HomeKho = ({ navigation }: any) => {
     }, 3000);
     return () => clearInterval(time);
   }, [imagePosition1, imagePosition2]);
+
+ 
 
   const renderDot1 = () => {
     return img.map((dot, index) => {
@@ -222,7 +231,7 @@ const HomeKho = ({ navigation }: any) => {
             marginRight: 15,
             borderRadius: 7,
             width: 382,
-            marginLeft: 15,
+            marginLeft: 7,
 
           }}
           source={item.hinh}
@@ -235,7 +244,7 @@ const HomeKho = ({ navigation }: any) => {
   const renderItem = ({ item, index }: any) => {
     return (
 
-      <View style={{ width: 90, height: 90, borderRadius: 3, backgroundColor: '#f6f6f6', margin: 3, justifyContent: 'space-around', marginLeft: 7, marginRight: 7 }}>
+      <View style={{ width: 90, height: 90, borderRadius: 3, backgroundColor: '#f6f6f6',  justifyContent: 'space-around',marginHorizontal:4 }}>
         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
           <Image source={item.img}
             style={{ width: 41, height: 41 }} />
@@ -247,7 +256,7 @@ const HomeKho = ({ navigation }: any) => {
 
   const renderHinh = ({ item, index }: any) => {
     return (
-      <View style={{ marginHorizontal: 12, paddingVertical: 10 }}>
+      <View style={{ marginHorizontal: 7, paddingVertical: 10 }}>
         <Image source={item.hinh}
           style={{ width: 183, height: 153 }} />
       </View>
@@ -256,7 +265,7 @@ const HomeKho = ({ navigation }: any) => {
 
   const renderSP = ({ item, index }: any) => {
     return (
-      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 12, borderWidth: 0.3 }}>
+      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3 }}>
         <Image source={item.hinh}
           style={{ width: 131, height: 112 }} />
         <View>
@@ -276,6 +285,8 @@ const HomeKho = ({ navigation }: any) => {
     )
   }
 
+
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -285,21 +296,28 @@ const HomeKho = ({ navigation }: any) => {
           <Image source={require('../../img/cart20regular.png')}
             style={styles.cartIcon} />
         </TouchableOpacity>
-
-        <View style={styles.searchContainer}>
-          <View style={styles.searchInput}>
+       
+          <View style={{ width: 320, height: 46, borderWidth: 0.5, borderRadius: 7, backgroundColor: '#fff', marginRight: 40, marginVertical: 20,flexDirection:'row' }}>
             <View style={styles.viewthanhtimkiem}>
-              <Text style={styles.text1}>Bạn cần tìm gì?</Text>
-              <Image source={require('../../img/ei_search.png')}
-                style={styles.searchIcon} />
+            <View style={{flexDirection:"row",alignItems:'center'}}>
+              <TextInput
+                onChangeText={(text) => setSearchKeyword(text)}
+                placeholder="Bạn cần tìm gì?"
+                style={{fontSize:16,fontWeight:"400",color:'#c2c2c2'}}
+              />
+              <TouchableOpacity onPress={() =>navigation.navigate('timkiem')}>
+                <Image
+                  source={require("../../img/ei_search.png")}
+                  style={styles.searchIcon}
+                />
+              </TouchableOpacity>
+              
             </View>
+            <Image source={require('../../img/Rectangle-313.png')} style={{ width: 23, height: 23 ,marginLeft:25}} />
+          </View>
           </View>
 
-          <Image source={require('../../img/Rectangle-313.png')}
-            style={styles.searchIcon} />
 
-
-        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -418,8 +436,8 @@ const styles = StyleSheet.create({
     top: 40,
   },
   cartIcon: {
-    marginLeft: 350,
-    bottom: 15,
+    marginLeft: 330,
+    bottom: 10,
   },
   searchContainer: {
     flexDirection: 'row',
@@ -437,13 +455,13 @@ const styles = StyleSheet.create({
   searchIcon: {
     width: 23,
     height: 23,
+    marginLeft:160
   },
   viewthanhtimkiem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginHorizontal: 20,
-    marginVertical: 10
+    paddingHorizontal: 10
   },
   text1: {
     fontSize: 16,
@@ -538,7 +556,7 @@ const styles = StyleSheet.create({
     width: 382,
     height: 159,
     borderRadius: 5,
-    marginLeft: 15
+    marginLeft: 7
   },
   viewUdai: {
     flexDirection: 'row',
