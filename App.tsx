@@ -44,7 +44,6 @@ const App = () => {
 
     
     return (
-   
             <NavigationContainer>
                 <Stack.Navigator>
                     <Stack.Screen name="home" component={BottomTab} options={{ headerShown: false }} />

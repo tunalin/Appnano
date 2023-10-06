@@ -148,12 +148,6 @@ const dataSP = [
     hoa: 'Hoa hồng: ',
     sohoa: '380,000đ'
   },
-
-
-
-
-
-
 ]
 
 const HomeKho = ({ navigation }: any) => {
@@ -195,7 +189,6 @@ const HomeKho = ({ navigation }: any) => {
             borderRadius: 5, marginHorizontal: 5
           }}
         >
-
         </View>
       )
     })
@@ -215,15 +208,12 @@ const HomeKho = ({ navigation }: any) => {
 
           }}
         >
-
         </View>
       )
     })
   }
-
   const renderImg = ({ item, index }: any) => {
     return (
-
       <View key={item.id}>
         <Image
           style={{
@@ -231,20 +221,17 @@ const HomeKho = ({ navigation }: any) => {
             marginRight: 15,
             borderRadius: 7,
             width: 382,
-            marginLeft: 7,
-
+            marginLeft: 16,
           }}
           source={item.hinh}
         />
       </View>
     )
-
   }
-
   const renderItem = ({ item, index }: any) => {
     return (
 
-      <View style={{ width: 90, height: 90, borderRadius: 3, backgroundColor: '#f6f6f6',  justifyContent: 'space-around',marginHorizontal:4 }}>
+      <View style={{ width: 90, height: 90, borderRadius: 3, backgroundColor: '#f6f6f6',  justifyContent: 'space-around',marginHorizontal:5,left:7 }}>
         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
           <Image source={item.img}
             style={{ width: 41, height: 41 }} />
@@ -253,19 +240,17 @@ const HomeKho = ({ navigation }: any) => {
       </View>
     )
   }
-
   const renderHinh = ({ item, index }: any) => {
     return (
-      <View style={{ marginHorizontal: 7, paddingVertical: 10 }}>
+      <View style={{ marginHorizontal: 11, paddingVertical: 10 }}>
         <Image source={item.hinh}
           style={{ width: 183, height: 153 }} />
       </View>
     )
   }
-
   const renderSP = ({ item, index }: any) => {
     return (
-      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3 }}>
+      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 12, borderWidth: 0.3 }}>
         <Image source={item.hinh}
           style={{ width: 131, height: 112 }} />
         <View>
@@ -284,9 +269,6 @@ const HomeKho = ({ navigation }: any) => {
       </View>
     )
   }
-
-
-
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -296,7 +278,6 @@ const HomeKho = ({ navigation }: any) => {
           <Image source={require('../../img/cart20regular.png')}
             style={styles.cartIcon} />
         </TouchableOpacity>
-       
           <View style={{ width: 320, height: 46, borderWidth: 0.5, borderRadius: 7, backgroundColor: '#fff', marginRight: 40, marginVertical: 20,flexDirection:'row' }}>
             <View style={styles.viewthanhtimkiem}>
             <View style={{flexDirection:"row",alignItems:'center'}}>
@@ -311,15 +292,11 @@ const HomeKho = ({ navigation }: any) => {
                   style={styles.searchIcon}
                 />
               </TouchableOpacity>
-              
             </View>
             <Image source={require('../../img/Rectangle-313.png')} style={{ width: 23, height: 23 ,marginLeft:25}} />
           </View>
           </View>
-
-
       </View>
-
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.hinhnenxanh}>
           <FlatList
@@ -347,7 +324,6 @@ const HomeKho = ({ navigation }: any) => {
             horizontal
             scrollEnabled={false}
             showsHorizontalScrollIndicator={false}
-
           />
         </View>
         <Text style={styles.texttopsanpham}>TOP SẢN PHẨM</Text>
@@ -393,7 +369,6 @@ const HomeKho = ({ navigation }: any) => {
             horizontal={true}
             showsHorizontalScrollIndicator={false}
             pagingEnabled={true}
-
           />
           <View style={styles.hopdot2}>
             {renderDot2()}
@@ -414,12 +389,8 @@ const HomeKho = ({ navigation }: any) => {
         </View>
       </ScrollView>
     </View>
-
-
   )
 }
-
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -556,7 +527,7 @@ const styles = StyleSheet.create({
     width: 382,
     height: 159,
     borderRadius: 5,
-    marginLeft: 7
+    marginLeft: 15
   },
   viewUdai: {
     flexDirection: 'row',

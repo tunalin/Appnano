@@ -5,7 +5,7 @@ const DetailDonHang = ({ navigation }: any) => {
     return (
         <View style={styles.container}>
             <View style={styles.viewctdh}>
-                <TouchableOpacity onPress={() => navigation.navigate('taikhoan')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                     <Image source={require('../../imgcart/back.png')}
                         style={styles.nutlui} />
                 </TouchableOpacity>
