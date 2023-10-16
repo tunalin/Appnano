@@ -14,7 +14,7 @@ export const DataTong = [
         {
             id: '2',
             hinh: require('../../imgcart/dlcpro.png'),
-            ten: 'DL12 Probiotic',
+            ten: 'DL12 Probiotic Prooodastyash',
             gia: '610,000đ',
             hoahong:'380,000đ',
         },

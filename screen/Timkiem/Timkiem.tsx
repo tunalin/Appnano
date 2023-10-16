@@ -3,7 +3,15 @@ import React, { useEffect, useState } from 'react'
 import { addTask, deletetask, addToCart } from '../../Realm/realm';
 import realmData from '../../Realm/dataRealm';
 import { DataTong } from '../DATASanPham/DataTong';
-
+import LottieView from "lottie-react-native";
+import Animated, {
+    Easing,
+    Extrapolate,
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+} from 'react-native-reanimated';
 
 const addSP = realmData.objects('CartItem')
 
@@ -11,7 +19,7 @@ const Timkiem = ({ navigation }: any) => {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [searchHistory, setSearchHistory] = useState<Realm.Results<Realm.Object & { id: number; name: string }>>();
     const [searchResults, setSearchResults] = useState<any[]>([]);
-    
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
     useEffect(() => {
         // Define your event handler function
@@ -64,6 +72,22 @@ const Timkiem = ({ navigation }: any) => {
             });
     }
 
+    const showConfirmation = useSharedValue(0);
+
+    const rStyle = useAnimatedStyle(() => {
+        const hideNofi = interpolate(
+            showConfirmation.value,
+            [0, 1],
+            [0, 1],
+            Extrapolate.CLAMP
+        )
+        return {
+            opacity: hideNofi,
+
+        };
+    });
+
+
     const renderSP = ({ item }: any) => {
         const handleAddToCart = () => {
             const existingCartItem: any = addSP.filtered(`id == '${item.id}'`)[0]
@@ -74,33 +98,47 @@ const Timkiem = ({ navigation }: any) => {
                 })
             } else {
                 addToCart(item.id, 1, item.ten, item.gia)
-                console.log(addSP)
+
             }
 
-            // Sau khi thêm vào giỏ hàng, chuyển hướng đến màn hình giỏ hàng
-            navigation.navigate('Cart')
-            // Đảm bảo đặt tên màn hình giỏ hàng đúng
+            setShowSuccessMessage(true);
+            showConfirmation.value = withSpring(1, {
+                duration: 2000
+            }, () => {
+                showConfirmation.value = withSpring(0)
+            });
+            setTimeout(() => {
+                setShowSuccessMessage(false);
+            }, 2000);
         };
         return (
-            <TouchableOpacity onPress={handleAddToCart}>
-                <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3, padding: 10, marginTop: 15 }}>
-                    <Image source={item.hinh}
-                        style={{ width: 131, height: 112 }} />
-                    <View>
-                        <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>{item.ten}</Text>
-                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.ma}</Text>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.gia}</Text>
-                            <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{item.sogia}</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row' }}>
-                            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.hoa}</Text>
-                            <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.sohoa}</Text>
-                        </View>
 
+            <View style={{ width: 183, height: 260, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3, marginTop: 15 }}>
+                <Image source={item.hinh}
+                    style={{ width: 131, height: 112, marginTop: 20 }} />
+                <View style={{}}>
+                    <View style={{ height: 70 }}>
+                        <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>{item.ten}</Text>
                     </View>
+
+                    <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.ma}</Text>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.gia}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{item.sogia}</Text>
+                    </View>
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.hoa}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.sohoa}</Text>
+                    </View>
+
                 </View>
-            </TouchableOpacity>
+                <TouchableOpacity onPress={handleAddToCart}>
+                    <View style={{ borderWidth: 1, borderRadius: 100, height: 25, width: 25, alignItems: 'center', backgroundColor: '#000', marginLeft: 150, bottom: 15 }}>
+                        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>+</Text>
+                    </View>
+                </TouchableOpacity>
+            </View>
+
 
         )
     }
@@ -108,6 +146,7 @@ const Timkiem = ({ navigation }: any) => {
     return (
 
         <View style={styles.container}>
+
             <View style={styles.top}>
                 <TouchableOpacity onPress={() => navigation.navigate('home')}>
                     <Image source={require('../../imgcart/back.png')} style={{ width: 20 }} />
@@ -139,6 +178,7 @@ const Timkiem = ({ navigation }: any) => {
 
 
             </View>
+
             <ScrollView>
                 <Text style={styles.text1}>Đã tìm gần đây</Text>
 
@@ -161,6 +201,7 @@ const Timkiem = ({ navigation }: any) => {
 
                 </View>
                 <View style={{ flex: 1, marginLeft: 10 }}>
+
                     <Text style={styles.text1}>Các kết quả tương ứng</Text>
                     <FlatList
                         data={searchResults}
@@ -173,9 +214,21 @@ const Timkiem = ({ navigation }: any) => {
                 </View>
 
             </ScrollView>
-
-
-
+            {showSuccessMessage && (
+                <Animated.View
+                    style={[
+                        styles.successMessage,
+                        rStyle
+                    ]}
+                >
+                    <LottieView
+                        source={require('../../asset/checkload.json')}
+                        style={{ width: 40, height: 40 }}
+                        autoPlay
+                    />
+                    <Text style={styles.successMessageText}>Đã thêm vào giỏ hàng</Text>
+                </Animated.View>
+            )}
         </View>
     )
 }
@@ -240,7 +293,25 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '400',
         color: '#000'
-    }
+    },
+    successMessage: {
+        backgroundColor: '#4CAF50',
+        padding: 10,
+        alignItems: 'center',
+        width: 300,
+        height: 100,
+        justifyContent: 'center',
+
+        borderRadius: 15,
+        position: 'absolute',
+        left: 55,
+        top: 300
+    },
+    successMessageText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 })
 
 export default Timkiem

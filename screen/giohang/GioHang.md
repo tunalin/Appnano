@@ -4,11 +4,27 @@ import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler"
 import realmData from "../../Realm/dataRealm";
 import { DataTong } from "../DATASanPham/DataTong";
 import { deleteSp, updateSp } from "../../Realm/realm";
-
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withSpring,
+    useAnimatedGestureHandler,
+} from 'react-native-reanimated';
 
 const update: any = realmData.objects('CartItem')
 
 const GioHng = ({ navigation }: any) => {
+
+    const translateX = useSharedValue(0);
+
+    const swipeableItemStyle = useAnimatedStyle(() => {
+        return {
+            transform: [{ translateX: translateX.value }],
+        };
+    });
+
+
+
 
     useEffect(() => {
         const handleDataUpdate = () => {
@@ -34,23 +50,22 @@ const GioHng = ({ navigation }: any) => {
 
     const rightSwipe = (id: string) => {
         return (
-            <TouchableOpacity onPress={()=>handleClearCart(id)}>
-                <View style={{ justifyContent: 'center', alignItems: 'center', paddingLeft: 5 }}>
-                    <Image source={require('../../imgcart/thungrac.png')} style={{ marginRight: 35 }} />
+            <TouchableOpacity onPress={() => handleClearCart(id)}>
+                <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 45 }}>
+                    <Image source={require("../../imgcart/thungrac.png")} style={{ marginRight: 35 }} />
                 </View>
             </TouchableOpacity>
-        )
-    }
-    const handleClearCart = (id:string) => {
+        );
+    };
+    const handleClearCart = (id: string) => {
         deleteSp(id)
-          .then(() => {
-            // Cart has been cleared, you can update your UI accordingly
-            setCartItems([]); // Update your state to clear the cart items from your UI
-          })
-          .catch((error: any) => {
-            console.error('Error clearing cart:', error);
-          });
-      };
+            .then(() => {
+
+            })
+            .catch((error: any) => {
+                console.error('Error clearing cart:', error);
+            });
+    };
 
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
     const [selectAll, setSelectAll] = useState(false);
@@ -114,7 +129,7 @@ const GioHng = ({ navigation }: any) => {
         if (updatedCartItem && updatedCartItem.soluong > 1) {
             // Check if the current quantity is greater than 1 before decrementing
             updateSp(id, updatedCartItem.soluong - 1);
-            const updatedCartItems :any= cartItems.map((item:any) =>
+            const updatedCartItems: any = cartItems.map((item: any) =>
                 item.id === id ? { ...item, soluong: updatedCartItem.soluong - 1 } : item
             );
             setCartItems(updatedCartItems);
@@ -123,15 +138,32 @@ const GioHng = ({ navigation }: any) => {
         }
     };
 
+    const leftSwipe = (id: string) => {
+        return (
+            <TouchableOpacity onPress={() => handleClearCart(id)}>
+                <View style={{ justifyContent: "center", alignItems: "center", paddingTop: 45, backgroundColor: "red" }}>
+                    <Image source={require("../../imgcart/thungrac.png")} style={{ marginRight: 35 }} />
+                </View>
+            </TouchableOpacity>
+        );
+    };
+
     const renderCartItem = ({ item }: { item: any }) => {
         if (!item || !item.id) {
             return null;
         }
+        const handleSwipeRight = () => {
+            // Handle item deletion when swiped right
+            handleClearCart(item.id);
+        };
         return (
             <TouchableOpacity onPress={() => navigation.navigate('Detail', { item })}>
-                <Swipeable renderRightActions={() => rightSwipe(item.id)}>
+                <Swipeable
+                    renderRightActions={() => rightSwipe(item.id)}
+                    onSwipeableRightOpen={handleSwipeRight} // Add this line to handle swipe right action
+                >
 
-                    <View style={styles.view}>
+                    <Animated.View style={[styles.view]}>
                         <View style={{ padding: 15 }}>
                             <TouchableOpacity onPress={() => handleCheckBoxPress(item.id)}>
                                 <View style={{
@@ -178,7 +210,7 @@ const GioHng = ({ navigation }: any) => {
 
                             </View>
                         </View>
-                    </View>
+                    </Animated.View>
                 </Swipeable>
             </TouchableOpacity>
 

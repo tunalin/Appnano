@@ -81,23 +81,7 @@ const TabNavigator = () => {
                  ),
              }}
              />
-              <Tab.Screen name="taikhoan" component={Account} options={{
-                tabBarLabelStyle:{display:'none'},
-                tabBarIcon: ({ focused }) => (
-                    focused ?
-                        <View style={styles.bacGHome}>
-                            <Image source={require('../imgvector/accountxanh.png')}
-                                style={[styles.iconHome]}
-                            />
-                        </View>
-                        : <Image source={require('../imgvector/account.png')}
-                            style={{ width: 24, height: 24 }}
-                        />
-                ),
-            }}
-            />
-
-            {/* <Tab.Screen name="chuadangnhap" component={ChuaDangNhap} options={{
+              {/* <Tab.Screen name="taikhoan" component={Account} options={{
                 tabBarLabelStyle:{display:'none'},
                 tabBarIcon: ({ focused }) => (
                     focused ?
@@ -112,6 +96,22 @@ const TabNavigator = () => {
                 ),
             }}
             /> */}
+
+            <Tab.Screen name="chuadangnhap" component={ChuaDangNhap} options={{
+                tabBarLabelStyle:{display:'none'},
+                tabBarIcon: ({ focused }) => (
+                    focused ?
+                        <View style={styles.bacGHome}>
+                            <Image source={require('../imgvector/accountxanh.png')}
+                                style={[styles.iconHome]}
+                            />
+                        </View>
+                        : <Image source={require('../imgvector/account.png')}
+                            style={{ width: 24, height: 24 }}
+                        />
+                ),
+            }}
+            />
         </Tab.Navigator>
     )
 }

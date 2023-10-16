@@ -31,7 +31,7 @@ const renderItem = ({ item, index }: any) => {
 const DangNhap = ({ navigation }: any) => {
     return (
         <View style={styles.container}>
-            <TouchableOpacity onPress={() => navigation.navigate('taikhoan')}>
+            <TouchableOpacity onPress={() => navigation.navigate('chuadangnhap')}>
                 <Image source={require('../../imgcart/back.png')}
                     style={styles.view1} />
             </TouchableOpacity>

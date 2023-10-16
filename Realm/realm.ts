@@ -60,14 +60,16 @@ export const updateSp = (id: string, soluong: number) => {
 };
 
 export const deleteSp = (id: string) => {
-  return new Promise((resolve: any) => {
+  return new Promise((resolve, reject) => {
     realmData.write(() => {
       const itemToDelete = realmData.objectForPrimaryKey('CartItem', id);
       if (itemToDelete) {
         realmData.delete(itemToDelete);
+        resolve('Deleted successfully'); // Trả về một chuỗi (string) để xác nhận việc xóa thành công
+      } else {
+        reject('Item not found'); // Trả về một chuỗi (string) để xác nhận lỗi
       }
-      resolve();
-    })
-  })
-}
+    });
+  });
+};
 
