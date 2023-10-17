@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, ScrollView } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
-import Animated, { Easing, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { Easing, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated";
 
 
 
@@ -164,100 +164,60 @@ const HomeKho = ({ navigation }: any) => {
   const [searchKeyword, setSearchKeyword] = useState("");
 
 
+
   const scrollY = useSharedValue(0);
-  const [searchExpanded, setSearchExpanded] = useState(false);
   const SEARCH_BAR_WIDTH = 320;
   const translateX = useSharedValue(0);
-
+  const [searchBarVisible, setSearchBarVisible] = useState(true);
 
 
   const handleScroll = (event: any) => {
-    scrollY.value = event.nativeEvent.contentOffset.y;
-  };
+    const offsetY = event.nativeEvent.contentOffset.y;
 
-  const gestureHandler = useAnimatedGestureHandler({
-    onActive: (event) => {
+    // Khi cuộn đủ một khoảng cố định (ví dụ: 50), ẩn thanh tìm kiếm, ngược lại hiện lại nó.
+    const threshold = 160;
+    if (offsetY > threshold && searchBarVisible) {
+      setSearchBarVisible(false);
+    } else if (offsetY <= threshold && !searchBarVisible) {
+      setSearchBarVisible(true);
+    }
+
+    scrollY.value = offsetY;
+  };
+  const gestureHandler = useAnimatedScrollHandler({
+    onScroll: (event: any) => {
       translateX.value = event.translationX;
-    },
-    onEnd: () => {
-      // Đặt logic nếu bạn muốn xử lý khi kết thúc vuốt ở đây.
-    },
+
+    }
+
+
   });
   const searchBarStyle = useAnimatedStyle(() => {
-    const translatex = interpolate(
-          scrollY.value,
-          [0, SEARCH_BAR_WIDTH],
-          [0, -SEARCH_BAR_WIDTH],
-          Extrapolate.CLAMP
-        );
-        const opacity = interpolate(
-          scrollY.value,
-          [0, 320],
-          [1, 0], // Fade out when sliding left
-          Extrapolate.CLAMP
-        );
+    const translatex = withTiming(searchBarVisible ? 0 : -SEARCH_BAR_WIDTH);
+    const opacity = withTiming(searchBarVisible ? 1 : 0);
+
     return {
-      transform: [{ translateX: withSpring(translatex) }],
-      opacity:opacity
+      transform: [{ translateX: translatex }],
+      opacity: opacity
     };
   });
 
   const iconStyle = useAnimatedStyle(() => {
-    const iconsearch = interpolate(
-          scrollY.value,
-          [0, SEARCH_BAR_WIDTH],
-          [0, -SEARCH_BAR_WIDTH],
-          Extrapolate.CLAMP
-        );
+    const threshold = 160; // Ngưỡng để kiểm tra khi nên di chuyển biểu tượng
+
+    // Nếu người dùng vuốt lên, chỉ thay đổi giá trị translateX
+    const translateX = scrollY.value >= threshold ? -SEARCH_BAR_WIDTH : 0;
+
     return {
-      transform: [{ translateX: withSpring(iconsearch) }],
+      transform: [{ translateY: 0 }, { translateX }],
     };
   });
 
-  // const searchBarStyle = useAnimatedStyle(() => {
-  //   const translateX = interpolate(
-  //     scrollY.value,
-  //     [0, SEARCH_BAR_WIDTH],
-  //     [0, -SEARCH_BAR_WIDTH],
-  //     Extrapolate.CLAMP
-  //   );
-  //   const opacity = interpolate(
-  //     scrollY.value,
-  //     [0, 320],
-  //     [1, 0], // Fade out when sliding left
-  //     Extrapolate.CLAMP
-  //   );
-
-  //   return {
-  //     opacity,
-  //     transform: [{ translateX: translateX }],
-  //   };
-  // });
-  // const styleIcon = useAnimatedStyle(() => {
-  //   const iconsearch = interpolate(
-  //     scrollY.value,
-  //     [0, SEARCH_BAR_WIDTH],
-  //     [0, -SEARCH_BAR_WIDTH],
-  //     Extrapolate.CLAMP
-  //   );
 
 
-  //   return {
-  //     transform: [{
-  //       translateX: iconsearch,
-
-  //     }]
-  //   }
-  // })
 
   const styleCart = useAnimatedStyle(() => {
-
-    const cartX = interpolate(
-      scrollY.value,
-      [0, SEARCH_BAR_WIDTH],
-      [0, -280],
-      Extrapolate.CLAMP
-    );
+    const cartX = scrollY.value <= 160 ? 0 : -280; // Di chuyển ngay khi người dùng cuộn
     const cartY = interpolate(
       scrollY.value,
       [0, SEARCH_BAR_WIDTH],
@@ -266,11 +226,7 @@ const HomeKho = ({ navigation }: any) => {
     );
 
     return {
-
-      transform: [
-        { translateX: withSpring(cartX) },
-        { translateY: withSpring(cartY) },
-      ],
+      transform: [withTiming({ translateX: cartX }), withTiming({ translateY: cartY })],
     };
   });
 
@@ -282,7 +238,7 @@ const HomeKho = ({ navigation }: any) => {
       setImagePosition2(nextPosition2)
       setactiveDotIndex2(nextPosition2)
       setImagePosition1(nextPosition1)
-      setactiveDotIndex1(nextPosition1)
+
       flatListRef1.current.scrollToIndex({ index: nextPosition1 });
       flatListRef2.current.scrollToIndex({ index: nextPosition2 });
     }, 3000);
@@ -292,23 +248,23 @@ const HomeKho = ({ navigation }: any) => {
 
 
 
-  const renderDot1 = () => {
-    return img.map((dot, index) => {
-      const isActive = index === activeDotIndex1;
-      return (
-        <View
-          key={index}
-          style={{
-            backgroundColor: '#fff',
-            width: isActive ? 10 : 7,
-            height: isActive ? 10 : 7,
-            borderRadius: 5, marginHorizontal: 5
-          }}
-        >
-        </View>
-      )
-    })
-  }
+  // const renderDot1 = () => {
+  //   return img.map((dot, index) => {
+  //     const isActive = index === activeDotIndex1;
+  //     return (
+  //       <View
+  //         key={index}
+  //         style={{
+  //           backgroundColor: '#fff',
+  //           width: isActive ? 10 : 7,
+  //           height: isActive ? 10 : 7,
+  //           borderRadius: 5, marginHorizontal: 5
+  //         }}
+  //       >
+  //       </View>
+  //     )
+  //   })
+  // }
   const renderDot2 = () => {
     return dataSP.map((dot, index) => {
       const isActive = index === activeDotIndex2;
@@ -430,7 +386,7 @@ const HomeKho = ({ navigation }: any) => {
 
           ]}>
 
-            <PanGestureHandler onGestureEvent={gestureHandler}>
+            <Animated.ScrollView onScroll={gestureHandler}>
 
               <Animated.View style={styles.viewthanhtimkiem}>
                 <View style={{ flexDirection: "row", alignItems: 'center' }}>
@@ -446,7 +402,7 @@ const HomeKho = ({ navigation }: any) => {
                 </View>
               </Animated.View>
 
-            </PanGestureHandler>
+            </Animated.ScrollView>
 
           </Animated.View>
 
@@ -489,9 +445,9 @@ const HomeKho = ({ navigation }: any) => {
               showsHorizontalScrollIndicator={false}
               pagingEnabled={true}
             />
-            <View style={styles.hopdot}>
+            {/* <View style={styles.hopdot}>
               {renderDot1()}
-            </View>
+            </View> */}
           </View>
 
           <View style={styles.viewdanhmuc}>
