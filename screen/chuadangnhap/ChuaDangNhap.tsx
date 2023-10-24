@@ -1,15 +1,58 @@
-import React from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
 import { Image, Text, View, TouchableOpacity, StyleSheet } from "react-native";
 
 const ChuaDangNhap = ({ navigation }: any) => {
+    const [fullname, setFullname] = useState('');
+    const [email, setEmail] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const fetchUserData = async () => {
+        try {
+            const data = await AsyncStorage.getItem('data');
+            if (data) {
+                const userData = JSON.parse(data);
+                setFullname(userData.data.fullname)
+                setEmail(userData.data.email)
+                setIsLoggedIn(true);
+            }
+        } catch (error) {
+            console.error('Lỗi khi đọc dữ liệu từ AsyncStorage:', error);
+        }
+    };
+    useFocusEffect(
+        React.useCallback(() => {
+            fetchUserData();
+        }, [])
+    );
+    const logout = async () => {
+        try {
+            await AsyncStorage.removeItem('data');
+            setFullname('');
+            setEmail('');
+            setIsLoggedIn(false);
+            console.log('đã thoát')
+        } catch (error) {
+            console.error('Lỗi khi đăng xuất:', error);
+        }
+    };
     return (
         <View style={styles.container}>
-            <View style={styles.view1}>
-                <View style={styles.viewhuong}>
-                    <Image source={require('../../imgtaikhoan/hinhaccount.png')}
-                        style={styles.imgnguoi} />
-                    <View style={styles.viewhuong2}>
-                        <Text style={styles.textU}>User</Text>
+            <View>
+                <View style={styles.view1}>
+                    <View style={styles.viewhuong}>
+                        <Image source={require('../../imgtaikhoan/hinhaccount.png')}
+                            style={styles.imgnguoi} />
+                        <View style={styles.viewhuong2}>
+                            {isLoggedIn ? (
+                                <>
+                                    <Text style={styles.textU}>{fullname}</Text>
+                                    <Text>{email}</Text>
+                                </>
+                            ) : (
+                                <Text style={styles.textU}>User</Text>
+                            )}
+                        </View>
                     </View>
                 </View>
             </View>
@@ -70,11 +113,15 @@ const ChuaDangNhap = ({ navigation }: any) => {
                         <Text style={styles.textdn}>Đăng nhập</Text>
                     </View>
                 </TouchableOpacity>
+                <TouchableOpacity onPress={logout}>
+                    <View style={styles.view5}>
+                        <Text style={styles.textdn}>Log out!</Text>
+                    </View>
+                </TouchableOpacity>
             </View>
         </View>
     )
 }
-
 const styles = StyleSheet.create({
     container: {
         width: '100%',
@@ -103,8 +150,8 @@ const styles = StyleSheet.create({
     },
     viewhuong2: {
         marginLeft: 18,
-        width: 47,
-        height: 24
+        width: '80%',
+
     },
     view2: {
         width: 143,
@@ -163,11 +210,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    textdn:{ 
-        fontSize: 16, 
-        fontWeight: '500', 
-        color: '#fff' 
+    view5: {
+        backgroundColor: 'red',
+        width: 326,
+        height: 52,
+        borderRadius: 7,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: 15
+    },
+    textdn: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#fff'
     }
 })
-
 export default ChuaDangNhap;
