@@ -1,7 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import axios from "axios";
+
 import React, { useEffect, useState } from "react";
 import { Image, Text, TouchableOpacity, View, FlatList, StyleSheet, TextInput } from "react-native";
+import { loginUser } from "../FetchApi/StoreData";
 
 
 
@@ -10,49 +10,10 @@ import { Image, Text, TouchableOpacity, View, FlatList, StyleSheet, TextInput } 
 const DangNhap = ({ navigation }: any) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [apiK, setApiK] = useState('');
-    const [mainDomain, setMainDomain] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
 
-    useEffect(() => {
-
-        const fetchDataFromStorage = async () => {
-            const savedApiK = await AsyncStorage.getItem('apiK');
-            const savedMainDomain = await AsyncStorage.getItem('mainDomain');
-
-            if (savedApiK && savedMainDomain) {
-                setApiK(savedApiK);
-                setMainDomain(savedMainDomain);
-
-            }
-        };
-        fetchDataFromStorage();
-    }, []);
-
-
-
     const handleLogin = async () => {
-
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-        try {
-            const savedDomain = await AsyncStorage.getItem('mainDomain');
-            const savedApiKeyClient = await AsyncStorage.getItem('apiK');
-            if (savedDomain && savedApiKeyClient) {
-                const response = await axios.post(`${savedDomain}/client_init/login?apikey=${savedApiKeyClient}`, formData);
-                const responseData = response.data;
-                if (responseData.message === "success") {
-                    await AsyncStorage.setItem('data', JSON.stringify(responseData));
-                    navigation.navigate('User');
-                } else {
-                    console.log(responseData.message);
-                    setErrorMessage(responseData.message)
-                }
-            }
-        } catch (error) {
-            console.error('Lỗi khi thực hiện đăng nhập:', error);
-        }
+        loginUser(username, password, navigation, setErrorMessage);
     };
     return (
         <View style={styles.container}>
@@ -76,10 +37,10 @@ const DangNhap = ({ navigation }: any) => {
                     value={username}
                     onChangeText={(text) => {
                         setUsername(text);
-                        setErrorMessage(''); 
+                        setErrorMessage('');
                     }}
                 />
-                
+
                 <TextInput
                     style={styles.view}
                     placeholder="Mật khẩu"
@@ -87,7 +48,7 @@ const DangNhap = ({ navigation }: any) => {
                     value={password}
                     onChangeText={(text) => {
                         setPassword(text);
-                        setErrorMessage(''); 
+                        setErrorMessage('');
                     }}
                 />
                 <Text style={{ color: 'red' }}>{errorMessage}</Text>
@@ -125,7 +86,7 @@ const styles = StyleSheet.create({
     img: { width: 146, height: 81 },
     view3: { marginLeft: 50, marginTop: 20 },
     text1: { fontSize: 20, fontWeight: "500", color: '#005aa9' },
-    huong: { justifyContent: 'center', alignItems: 'center', padding: 2 },
+    huong: { justifyContent: 'center', alignItems: 'center', padding: 2, marginTop: 10 },
     huong1: { justifyContent: 'center', alignItems: 'center', marginTop: 40 },
     view4: { backgroundColor: '#005aa9', width: 326, height: 52, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
     text2: { fontSize: 16, fontWeight: '500', color: '#fff' },

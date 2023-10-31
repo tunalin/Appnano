@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, ScrollView } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated, { Easing, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated";
-
-
-
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ProductList, fetchApiData } from "../FetchApi/StoreData";
 
 
 const img = [
@@ -155,6 +155,70 @@ const PlaceholderText = "Bạn cần tìm gì ?";
 const PlaceholderDelay = 10;
 
 const HomeKho = ({ navigation }: any) => {
+  const [apiK, setApiK] = useState('');
+  const [apid1, setapid1] = useState([])
+  const [mainDomain, setMainDomain] = useState('');
+  const [category, setcategory] = useState<any>([])
+  const [sanpham, setsanpham] = useState<any>(2)
+  const [spmoi, setspmoi] = useState([])
+
+  const fetchProductList = async () => {
+    const product = await ProductList(2);
+    const respon = product.data.l
+    setsanpham(respon)
+
+  }
+
+  const fetchBanner = async () => {
+
+    const banner = await ProductList(2);
+    const responData = banner.data.theme
+    setcategory(responData)
+    setspmoi(responData)
+  };
+
+  const fetchData = async () => {
+    try {
+      const apiData = await fetchApiData();
+      if (apiData && apiData.data) {
+        await AsyncStorage.setItem('apiK', apiData.data.apikey);
+        await AsyncStorage.setItem('mainDomain', apiData.data.main_domain);
+        setApiK(apiData.data.apikey);
+        setMainDomain(apiData.data.main_domain);
+        console.log(JSON.stringify(apid1));
+      } else {
+        console.log('API data not found');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  const loadDataFromStorage = async () => {
+    try {
+
+      const savedApiK = await AsyncStorage.getItem('apiK');
+      const savedMainDomain = await AsyncStorage.getItem('mainDomain');
+      if (savedApiK && savedMainDomain) {
+        setApiK(savedApiK);
+        setMainDomain(savedMainDomain);
+        console.log('dữ liệu đã tạo')
+        fetchBanner();
+        fetchProductList();
+      } else {
+
+        await fetchData();
+        console.log('tạo dữ liệu mới')
+        fetchBanner();
+        fetchProductList();
+      }
+    } catch (error) {
+      console.error('Lỗi khi tải dữ liệu từ AsyncStorage:', error);
+    }
+  };
+  useEffect(() => {
+    loadDataFromStorage();
+  }, []);
   const flatListRef1: any = useRef(null);
   const flatListRef2: any = useRef(null)
   const [imagePosition1, setImagePosition1] = useState(0);
@@ -162,26 +226,18 @@ const HomeKho = ({ navigation }: any) => {
   const [activeDotIndex1, setactiveDotIndex1] = useState(0);
   const [activeDotIndex2, setactiveDotIndex2] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
-
-
-
   const scrollY = useSharedValue(0);
   const SEARCH_BAR_WIDTH = 320;
   const translateX = useSharedValue(0);
   const [searchBarVisible, setSearchBarVisible] = useState(true);
-
-
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
-
-    // Khi cuộn đủ một khoảng cố định (ví dụ: 50), ẩn thanh tìm kiếm, ngược lại hiện lại nó.
     const threshold = 160;
     if (offsetY > threshold && searchBarVisible) {
       setSearchBarVisible(false);
     } else if (offsetY <= threshold && !searchBarVisible) {
       setSearchBarVisible(true);
     }
-
     scrollY.value = offsetY;
   };
   const gestureHandler = useAnimatedScrollHandler({
@@ -189,19 +245,15 @@ const HomeKho = ({ navigation }: any) => {
       translateX.value = event.translationX;
 
     }
-
-
   });
   const searchBarStyle = useAnimatedStyle(() => {
     const translatex = withTiming(searchBarVisible ? 0 : -SEARCH_BAR_WIDTH);
     const opacity = withTiming(searchBarVisible ? 1 : 0);
-
     return {
       transform: [{ translateX: translatex }],
       opacity: opacity
     };
   });
-
   const iconStyle = useAnimatedStyle(() => {
     const threshold = 160; // Ngưỡng để kiểm tra khi nên di chuyển biểu tượng
 
@@ -212,9 +264,6 @@ const HomeKho = ({ navigation }: any) => {
       transform: [{ translateY: 0 }, { translateX }],
     };
   });
-
-
-
 
   const styleCart = useAnimatedStyle(() => {
     const cartX = scrollY.value <= 160 ? 0 : -280; // Di chuyển ngay khi người dùng cuộn
@@ -238,7 +287,6 @@ const HomeKho = ({ navigation }: any) => {
       setImagePosition2(nextPosition2)
       setactiveDotIndex2(nextPosition2)
       setImagePosition1(nextPosition1)
-
       flatListRef1.current.scrollToIndex({ index: nextPosition1 });
       flatListRef2.current.scrollToIndex({ index: nextPosition2 });
     }, 3000);
@@ -300,18 +348,7 @@ const HomeKho = ({ navigation }: any) => {
       </View>
     )
   }
-  const renderItem = ({ item, index }: any) => {
-    return (
 
-      <View style={{ width: 90, height: 90, borderRadius: 3, backgroundColor: '#f6f6f6', justifyContent: 'space-around', marginHorizontal: 5, left: 7 }}>
-        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-          <Image source={item.img}
-            style={{ width: 41, height: 41 }} />
-          <Text style={{ fontSize: 13, fontWeight: "400", color: '#000' }}>{item.ten}</Text>
-        </View>
-      </View>
-    )
-  }
   const renderHinh = ({ item, index }: any) => {
     return (
       <View style={{ marginHorizontal: 11, paddingVertical: 10 }}>
@@ -321,23 +358,101 @@ const HomeKho = ({ navigation }: any) => {
     )
   }
   const renderSP = ({ item, index }: any) => {
+    const price = parseFloat(item.price);
+
+    // Format the price to include thousands separators and two decimal places
+    const formattedPrice = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     return (
-      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 12, borderWidth: 0.3 }}>
-        <Image source={item.hinh}
-          style={{ width: 131, height: 112 }} />
+      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 4, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 12, borderWidth: 0.3, paddingVertical: 20, marginTop: 20 }}>
+        <Image source={{ uri: item.img_1 }} style={{ width: 131, height: 112 }} />
         <View>
-          <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>{item.ten}</Text>
+          <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>
+
+            <Text>
+              {item.product_name.length > 20
+                ? item.product_name.slice(0, 20) + '...'
+                : item.product_name}
+            </Text>
+
+          </Text>
           <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.ma}</Text>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.gia}</Text>
-            <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{item.sogia}</Text>
+            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Giá bán: </Text>
+            <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{formattedPrice}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.hoa}</Text>
-            <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.sohoa}</Text>
+            <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Hoa hồng: </Text>
+            <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.unit_import}</Text>
           </View>
-
         </View>
+      </View>
+    );
+  }
+
+  const renderSpMF = ({ item, index }: any) => {
+    const price = parseFloat(item.price);
+    const formattedPrice = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    return (
+      <View style={{ width: 183, height: 240, borderRadius: 7, elevation: 4, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 12, borderWidth: 0.3, paddingVertical: 20, marginTop: 20 }}>
+        <Image source={{ uri: item.img_1 }} style={{ width: 131, height: 112 }} />
+        <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>
+          <Text>
+            {item.product_name.length > 20
+              ? item.product_name.slice(0, 20) + '...'
+              : item.product_name}
+          </Text>
+        </Text>
+        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.code}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Giá bán: </Text>
+          <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{formattedPrice}</Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Hoa hồng: </Text>
+          <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.point}</Text>
+        </View>
+      </View>
+    )
+
+  }
+
+  const renderSpMoi = ({ item, index }: any) => {
+
+    return (
+      <View >
+        <FlatList
+          ref={flatListRef2}
+          data={item.product_1_list}
+          keyExtractor={(item) => item.product_id}
+          renderItem={renderSpMF}
+          scrollEnabled={false}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          pagingEnabled={true}
+        />
+      </View>
+    )
+  }
+
+  const renderCateGory1 = ({ item, index }: any) => {
+
+    return (
+      <View style={{ height: 90, justifyContent: 'center', alignItems: 'center', borderRadius: 15 }}>
+        <Image source={{ uri: item.icon }} style={{ width: 50, height: 50 }} />
+        <Text style={{ color: 'black' }}>{item.name}</Text>
+      </View>
+    )
+  }
+
+  const renderIndex = ({ item, index }: any) => {
+    return (
+      <View style={{ width: '90%', backgroundColor: '#d8d1d1', marginLeft: 20, borderRadius: 7 }}>
+        <FlatList
+          data={item.category_1_list}
+          keyExtractor={(item, index) => item.id}
+          renderItem={renderCateGory1}
+          style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 15, }}
+        />
       </View>
     )
   }
@@ -376,55 +491,36 @@ const HomeKho = ({ navigation }: any) => {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
-
         <Animated.View style={[styles.header]}>
           <Image source={require('../../img/Rectangle-2.png')} style={styles.logo} />
-
           <Animated.View style={[
             styles.searchContainer1,
             searchBarStyle,
-
           ]}>
-
             <Animated.ScrollView onScroll={gestureHandler}>
-
               <Animated.View style={styles.viewthanhtimkiem}>
                 <View style={{ flexDirection: "row", alignItems: 'center' }}>
-
                   <TextInput
                     onChangeText={(text) => setSearchKeyword(text)}
                     placeholder={displayedPlaceholder}
                     style={[{ fontSize: 16, fontWeight: "400", color: '#c2c2c2' }]}
-
                   />
-
-
                 </View>
               </Animated.View>
-
             </Animated.ScrollView>
-
           </Animated.View>
-
           <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-
             <Animated.Image source={require('../../img/cart20regular.png')}
               style={[styles.cartIcon, styleCart]} />
-
           </TouchableOpacity>
-
           <TouchableOpacity onPress={() => navigation.navigate('timkiem')}>
-
             <View>
-
               <Animated.Image
                 source={require("../../img/ei_search.png")}
                 style={[styles.searchIcon, iconStyle]}
               />
             </View>
-
           </TouchableOpacity>
-
           <Animated.Image source={require('../../img/Rectangle-313.png')}
             style={[styles.img1, iconStyle]} />
         </Animated.View>
@@ -432,9 +528,7 @@ const HomeKho = ({ navigation }: any) => {
           showsVerticalScrollIndicator={false}
           onScroll={handleScroll}
           scrollEventThrottle={16}
-
         >
-
           <View style={styles.hinhnenxanh}>
             <FlatList
               ref={flatListRef1}
@@ -449,19 +543,16 @@ const HomeKho = ({ navigation }: any) => {
               {renderDot1()}
             </View> */}
           </View>
-
           <View style={styles.viewdanhmuc}>
             <Text style={styles.danhmuc}>DANH MỤC</Text>
             <Text style={styles.xemtatca}>Xem tất cả</Text>
           </View>
-          <View >
+          <View>
             <FlatList
-              data={data}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem}
-              horizontal
+              data={category}
+              keyExtractor={(item, index) => item.id}
+              renderItem={renderIndex}
               scrollEnabled={false}
-              showsHorizontalScrollIndicator={false}
             />
           </View>
           <Text style={styles.texttopsanpham}>TOP SẢN PHẨM</Text>
@@ -501,12 +592,11 @@ const HomeKho = ({ navigation }: any) => {
           <View >
             <FlatList
               ref={flatListRef2}
-              data={dataSP}
-              keyExtractor={(item) => item.id}
-              renderItem={renderSP}
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-              pagingEnabled={true}
+              data={spmoi}
+              keyExtractor={(item: any, index) => item.id}
+              renderItem={renderSpMoi}
+              scrollEnabled={false}
+
             />
             <View style={styles.hopdot2}>
               {renderDot2()}
@@ -518,17 +608,17 @@ const HomeKho = ({ navigation }: any) => {
           </View>
           <View >
             <FlatList
-              data={dataSP}
-              keyExtractor={(item) => item.id}
+              data={sanpham}
+              keyExtractor={(item, index) => item.product_id}
               renderItem={renderSP}
               scrollEnabled={false}
-              horizontal
+              numColumns={2}
+
             />
           </View>
         </Animated.ScrollView>
       </View>
     </GestureHandlerRootView>
-
   )
 }
 const styles = StyleSheet.create({

@@ -153,7 +153,7 @@ const ChiTietTaiKhoan = ({ navigation }: any) => {
         <ScrollView showsVerticalScrollIndicator={false}>
             <View style={styles.container}>
                 <View style={styles.viewback}>
-                    <TouchableOpacity onPress={() => navigation.navigate('taikhoan')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Account')}>
                         <Image source={require('../../imgtaikhoan/back.png')}
                             style={styles.imgback} />
                     </TouchableOpacity>

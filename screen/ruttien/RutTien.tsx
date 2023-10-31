@@ -5,7 +5,7 @@ const RutTien = ({ navigation }: any) => {
     return (
         <View style={styles.container}>
             <View style={styles.top}>
-                <TouchableOpacity onPress={() => navigation.navigate('taikhoan')}>
+                <TouchableOpacity onPress={() => navigation.navigate('Account')}>
                     <Image source={require('../../imgtien/back.png')}
                         style={{ width: 20 }} />
                 </TouchableOpacity>

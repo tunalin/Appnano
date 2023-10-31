@@ -33,7 +33,7 @@ const ChiTietSp = ({ navigation, route }: any) => {
             </View>
             <View style={styles.huong2}>
                 <Image source={item.hinh}
-                    style={{ width: 382, height: 199 }} />
+                    style={{ width: 120, height: 120 }} />
             </View>
             <View style={styles.huong3}>
                 <View style={styles.huong4}>
