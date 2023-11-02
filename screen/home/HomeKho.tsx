@@ -6,47 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProductList, fetchApiData } from "../FetchApi/StoreData";
 
 
-const img = [
-  {
-    id: '1',
-    hinh: require('../../img/Rectangle-324.png')
-  },
-  {
-    id: '2',
-    hinh: require('../../img/Rectangle-324.png')
-  },
-  {
-    id: '3',
-    hinh: require('../../img/Rectangle-324.png')
-  },
-  {
-    id: '4',
-    hinh: require('../../img/Rectangle-324.png')
-  }
-]
-
-const data = [
-  {
-    id: '1',
-    img: require('../../img/Rectangle-377.png'),
-    ten: 'TPCN'
-  },
-  {
-    id: '2',
-    img: require('../../img/Rectangle-378.png'),
-    ten: 'Sữa'
-  },
-  {
-    id: '3',
-    img: require('../../img/Rectangle-379.png'),
-    ten: 'Dưỡng da'
-  },
-  {
-    id: '4',
-    img: require('../../img/Rectangle-380.png'),
-    ten: 'Chống nắng'
-  },
-]
 
 const hinh = [
   {
@@ -67,39 +26,7 @@ const hinh = [
   },
 ]
 
-const dataSP = [
-  {
-    id: '1',
-    hinh: require('../../img/Rectangle-293.png'),
-    ten: 'Auslac Lactoferrin (Giá Ưu Đãi)',
-    ma: 'AUS01',
-    gia: 'Giá bán: ',
-    sogia: '1,080,000đ',
-    hoa: 'Hoa hồng: ',
-    sohoa: '380,000đ'
-  },
-  {
-    id: '2',
-    hinh: require('../../img/Rectangle-293.png'),
-    ten: 'Auslac Lactoferrin (Giá Ưu Đãi)',
-    ma: 'AUS01',
-    gia: 'Giá bán: ',
-    sogia: '1,080,000đ',
-    hoa: 'Hoa hồng: ',
-    sohoa: '380,000đ'
-  },
-  {
-    id: '3',
-    hinh: require('../../img/Rectangle-293.png'),
-    ten: 'Auslac Lactoferrin (Giá Ưu Đãi)',
-    ma: 'AUS01',
-    gia: 'Giá bán: ',
-    sogia: '1,080,000đ',
-    hoa: 'Hoa hồng: ',
-    sohoa: '380,000đ'
-  },
 
-]
 
 const PlaceholderText = "Bạn cần tìm gì ?";
 const PlaceholderDelay = 10;
@@ -111,7 +38,9 @@ const HomeKho = ({ navigation }: any) => {
   const [category, setcategory] = useState<any>([])
   const [sanpham, setsanpham] = useState<any>(1)
   const [spmoi, setspmoi] = useState([])
-  // const [dataRef, setdataRef] = useState([])
+  const [bannerData, setbannerData] = useState([])
+
+  
 
   const fetchProductList = async () => {
     const product = await ProductList(1);
@@ -125,14 +54,20 @@ const HomeKho = ({ navigation }: any) => {
     const banner = await ProductList(2);
     const responData = banner.data.theme
 
+    const sanPhamMoiData = responData.filter((item: any) => item.id === "52");
     setcategory(responData)
-    setspmoi(responData)
-    // const newProducts = responData.find((item: { id: string; }) => item.id === "52");
-    // if (newProducts) {
-    //   const product1List = newProducts.product_1_list;
-    //   setdataRef(product1List);
-      // console.log(dataRef)
-    // }
+    setspmoi(sanPhamMoiData)
+
+
+    const bannerItem = responData.find((item: any) => item.id === "253");
+
+    if (bannerItem) {
+      const slideList = bannerItem.slide_list;
+      // console.log(JSON.stringify(slideList));
+      setbannerData(slideList)
+    } else {
+      console.log("Không tìm thấy dữ liệu cho id 253");
+    }
   };
 
 
@@ -183,7 +118,7 @@ const HomeKho = ({ navigation }: any) => {
   const flatListRef2: any = useRef(null)
   const [imagePosition1, setImagePosition1] = useState(0);
   const [imagePosition2, setImagePosition2] = useState(0);
-  // const [activeDotIndex1, setactiveDotIndex1] = useState(0);
+  const [activeDotIndex1, setactiveDotIndex1] = useState(0);
   const [activeDotIndex2, setactiveDotIndex2] = useState(0);
   const [searchKeyword, setSearchKeyword] = useState("");
   const scrollY = useSharedValue(0);
@@ -240,61 +175,62 @@ const HomeKho = ({ navigation }: any) => {
   });
 
 
+
   useEffect(() => {
-    const time = setInterval(() => {
-      const nextPosition1 = (imagePosition1 + 1) % img.length;
-      // const nextPosition2 = (imagePosition1 + 1) % img.length;
-      // setImagePosition2(nextPosition2)
-      // setactiveDotIndex2(nextPosition2)
-      setImagePosition1(nextPosition1)
-      flatListRef1.current.scrollToIndex({ index: nextPosition1 });
-      // flatListRef2.current.scrollToIndex({ index: nextPosition2 });
-    }, 3000);
-    return () => clearInterval(time);
-  }, [imagePosition1, imagePosition2]);
+    if (bannerData.length > 0) {
+      const time = setInterval(() => {
+        const nextPosition1 = (imagePosition1 + 1) % bannerData.length;
+        setImagePosition1(nextPosition1);
+        setactiveDotIndex1(nextPosition1);
+          flatListRef1.current.scrollToIndex({ index: nextPosition1 });
+      }, 3000);
+  
+      return () => clearInterval(time);
+    }
+  }, [imagePosition1, bannerData]);
 
 
 
-
-  // const renderDot1 = () => {
-  //   return img.map((dot, index) => {
-  //     const isActive = index === activeDotIndex1;
-  //     return (
-  //       <View
-  //         key={index}
-  //         style={{
-  //           backgroundColor: '#fff',
-  //           width: isActive ? 10 : 7,
-  //           height: isActive ? 10 : 7,
-  //           borderRadius: 5, marginHorizontal: 5
-  //         }}
-  //       >
-  //       </View>
-  //     )
-  //   })
-  // }
-
-  const renderDot2 = () => {
-    return dataSP.map((dot, index) => {
-      const isActive = index === activeDotIndex2;
+  const renderDot1 = () => {
+    return bannerData.map((dot, index) => {
+      const isActive = index === activeDotIndex1;
       return (
         <View
           key={index}
           style={{
-            backgroundColor: isActive ? '#005aa9' : '#D9D9D9',
+            backgroundColor: '#fff',
             width: isActive ? 10 : 7,
             height: isActive ? 10 : 7,
-            borderRadius: 5, marginHorizontal: 3,
-            marginTop: 10,
+            borderRadius: 5, marginHorizontal: 5
           }}
         >
         </View>
       )
     })
   }
+
+  // const renderDot2 = () => {
+  //   return spmoi.map((dot, index) => {
+  //     const isActive = index === activeDotIndex2;
+  //     return (
+  //       <View
+  //         key={index}
+  //         style={{
+  //           backgroundColor: isActive ? '#005aa9' : '#D9D9D9',
+  //           width: isActive ? 10 : 7,
+  //           height: isActive ? 10 : 7,
+  //           borderRadius: 5, marginHorizontal: 3,
+  //           marginTop: 10,
+  //         }}
+  //       >
+  //       </View>
+  //     )
+  //   })
+  // }
   const renderImg = ({ item, index }: any) => {
+
     return (
-      <View key={item.id}>
+      <View >
         <Image
           style={{
             height: 164,
@@ -303,7 +239,7 @@ const HomeKho = ({ navigation }: any) => {
             width: 382,
             marginLeft: 15,
           }}
-          source={item.hinh}
+          source={{ uri: item.banner }}
         />
       </View>
     )
@@ -372,27 +308,20 @@ const HomeKho = ({ navigation }: any) => {
 
   }
 
-
-
   const renderSpMoi = ({ item, index }: any) => {
-    if (item.id === "52") {
-
-      return (
-        <View>
-          <FlatList
-            ref={flatListRef2}
-            data={item.product_1_list}
-            keyExtractor={(item) => item.product_id}
-            renderItem={renderSpMF}
-            horizontal={true}
-            pagingEnabled={true}
-            showsHorizontalScrollIndicator={false}
-          />
-        </View>
-      );
-    } else {
-      return null;
-    }
+    return (
+      <View>
+        <FlatList
+          ref={flatListRef2}
+          data={item.product_1_list}
+          keyExtractor={(item) => item.product_id}
+          renderItem={renderSpMF}
+          horizontal={true}
+          pagingEnabled={true}
+          showsHorizontalScrollIndicator={false}
+        />
+      </View>
+    );
   }
 
   const renderCateGory1 = ({ item, index }: any) => {
@@ -449,6 +378,8 @@ const HomeKho = ({ navigation }: any) => {
     animatePlaceholder(0);
   }, []);
 
+
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <View style={styles.container}>
@@ -493,16 +424,16 @@ const HomeKho = ({ navigation }: any) => {
           <View style={styles.hinhnenxanh}>
             <FlatList
               ref={flatListRef1}
-              data={img}
-              keyExtractor={(item) => item.id}
+              data={bannerData}
+              keyExtractor={(item: any, index: any) => index}
               renderItem={renderImg}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
               pagingEnabled={true}
             />
-            {/* <View style={styles.hopdot}>
+            <View style={styles.hopdot}>
               {renderDot1()}
-            </View> */}
+            </View>
           </View>
           <View style={styles.viewdanhmuc}>
             <Text style={styles.danhmuc}>DANH MỤC</Text>
@@ -558,9 +489,9 @@ const HomeKho = ({ navigation }: any) => {
               renderItem={renderSpMoi}
               scrollEnabled={false}
             />
-            <View style={styles.hopdot2}>
+            {/* <View style={styles.hopdot2}>
               {renderDot2()}
-            </View>
+            </View> */}
           </View>
           <View style={styles.viewgycb}>
             <Text style={styles.text4}>GỢI Ý CHO BẠN</Text>
