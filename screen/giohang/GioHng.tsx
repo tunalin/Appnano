@@ -1,118 +1,105 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Image, Text, TouchableOpacity, View, StyleSheet, ScrollView } from "react-native";
-import { GestureHandlerRootView, Swipeable } from "react-native-gesture-handler";
+import React, { useEffect, useRef, useState } from "react";
+import { FlatList, Image, Text, TouchableOpacity, View, StyleSheet, } from "react-native";
+import { GestureHandlerRootView, ScrollView } from "react-native-gesture-handler";
 import realmData from "../../Realm/dataRealm";
-import { DataTong } from "../DATASanPham/DataTong";
 import { deleteSp, updateSp } from "../../Realm/realm";
-
 import ListItem from './ListItem';
 
-const update: any = realmData.objects('CartItem')
+const cartItems1: any = realmData.objects('CartItem');
 
 const GioHng = ({ navigation }: any) => {
-
+    const [cartItems, setCartItems] = useState([]);
+    const [selectedItems, setSelectedItems] = useState<any>([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [totalPrice, setTotalPrice] = useState(0);
 
     useEffect(() => {
-
         const handleDataUpdate = () => {
             const dataFromRealm: any = realmData.objects('CartItem');
-            setCartUpdated(dataFromRealm);
+            setCartItems(dataFromRealm);
         };
-
-
         realmData.addListener('change', handleDataUpdate);
-        console.log(update)
-
+        console.log(cartItems1)
         handleDataUpdate();
 
-
+        const initialTotalPrice: any = calculateTotalPrice();
+        setTotalPrice(initialTotalPrice);
         return () => {
-
             realmData.removeAllListeners();
         };
     }, []);
 
-    const handleClearCart = (id: string) => {
-        deleteSp(id)
+    const calculateTotalPrice = () => {
+        let total = 0;
+        for (const item of cartItems1) {
+            if (selectedItems.includes(item.product_id)) {
+                const itemPrice = item.price || 0;
+                const itemQuantity = item.soluong || 0; // Replace 'item.soluong' with the actual quantity field
+                total += itemPrice * itemQuantity;
+            }
+        }
+        return total;
+    };
+
+    const handleClearCart = (product_id: string) => {
+        deleteSp(product_id)
             .then(() => {
-                console.log('success',id)
+                console.log('success', product_id)
             })
             .catch((error: any) => {
                 console.error('Error clearing cart:', error);
             });
     };
 
-    const [selectedItems, setSelectedItems] = useState<string[]>([]);
-    const [selectAll, setSelectAll] = useState(false);
-    const [cartItems, setCartItems] = useState<[]>([]);
-    const handleCheckBoxPress = (item: any) => {
-        if (selectedItems.includes(item)) {
 
-            setSelectedItems([]);
+    const handleCheckBoxPress = (product_id: string) => {
+        if (selectedItems.includes(product_id)) {
+            setSelectedItems(selectedItems.filter((id: string) => id !== product_id));
         } else {
-
-            setSelectedItems([]);
+            setSelectedItems([...selectedItems, product_id]);
         }
     };
+    useEffect(() => {
+        const newTotalPrice = calculateTotalPrice();
+        setTotalPrice(newTotalPrice);
+    }, [selectedItems]);
+
+
     const handleSelectAllPress = () => {
         if (selectAll) {
             setSelectedItems([]);
         } else {
-            const allItemKeys: any = cartItems1.map((item) => item.id);
+            const allItemKeys: any = cartItems1.map((item: any) => item.product_id);
             setSelectedItems(allItemKeys);
         }
         setSelectAll(!selectAll);
+
     };
 
-    const cartItems1 = realmData.objects('CartItem');
 
-    const mapCartItems = (cartItems1: any, Datagiohang: any) => {
-        return Datagiohang.map((item2: any) => {
-            const matchedItem = cartItems1.find((item1: any) => item1.id === item2.id);
-            if (matchedItem) {
-
-                return {
-                    id: matchedItem.id,
-                    hinh: item2.hinh,
-                    ten: item2.ten,
-                    gia: item2.gia,
-                    soluong: matchedItem.soluong,
-                };
-            }
-        });
-    };
-
-    const [cartUpdated, setCartUpdated] = useState(false);
-    const cartItemsMapped = mapCartItems(cartItems1, DataTong);
-    const filteredCartItems = cartItemsMapped.filter((item: any) => item && item.id);
 
     const handleIncrement = (id: string) => {
-        const updatedCartItem = update.find((sp: any) => sp.id === id);
+        const updatedCartItem = cartItems1.find((sp: any) => sp.product_id === id);
         if (updatedCartItem) {
-
             updateSp(id, updatedCartItem.soluong + 1);
             const updatedCartItems: any = cartItems.map((item: any) =>
-                item.id === id ? { ...item, soluong: updatedCartItem.soluong + 1 } : item
+                item.product_id === id ? { ...item, soluong: updatedCartItem.soluong + 1 } : item
             );
             setCartItems(updatedCartItems);
-
         }
     };
     const handleDecrement = (id: string) => {
-
-        const updatedCartItem = update.find((sp: any) => sp.id === id);
+        const updatedCartItem = cartItems1.find((sp: any) => sp.product_id === id);
         if (updatedCartItem && updatedCartItem.soluong > 1) {
-
             updateSp(id, updatedCartItem.soluong - 1);
             const updatedCartItems: any = cartItems.map((item: any) =>
-                item.id === id ? { ...item, soluong: updatedCartItem.soluong - 1 } : item
+                item.product_id === id ? { ...item, soluong: updatedCartItem.soluong - 1 } : item
             );
             setCartItems(updatedCartItems);
-
-
         }
     };
 
+    const scrolllRef = useRef(null)
 
 
 
@@ -128,23 +115,27 @@ const GioHng = ({ navigation }: any) => {
                     <Text style={styles.text4}>Giỏ hàng</Text>
                 </View>
 
-                <FlatList
-                    data={filteredCartItems}
-                    keyExtractor={(item) => item.id.toString()}
-                    renderItem={({ item }: { item: any }) => (
-                        <ListItem
-                            item={item}
-                            onIncrement={handleIncrement}
-                            onDecrement={handleDecrement}
-                            onSelect={handleCheckBoxPress}
-                            isSelected={selectedItems.includes(item.id)}
-                            onDelete={handleClearCart}
-                            onNavigate={() => navigation.navigate('Detail', { item })}
 
-                        />
-                    )}
-                />
+                <ScrollView ref={scrolllRef} style={{ padding: 10, flex: 1 }} showsVerticalScrollIndicator={false}>
+                    <FlatList
+                        data={cartItems1}
+                        keyExtractor={(item) => item.product_id}
+                        scrollEnabled={false}
+                        renderItem={({ item }) => (
+                            <ListItem
+                                simultaneousHandlers={scrolllRef}
+                                item={item}
+                                onIncrement={handleIncrement}
+                                onDecrement={handleDecrement}
+                                onSelect={(product_id) => handleCheckBoxPress(product_id)}
+                                isSelected={selectedItems.includes(item.product_id)}
+                                onDelete={handleClearCart}
+                                onNavigate={() => navigation.navigate('Detail', { item })}
 
+                            />
+                        )}
+                    />
+                </ScrollView>
 
                 <View style={styles.view5}>
                     <View style={styles.view6}>
@@ -177,7 +168,7 @@ const GioHng = ({ navigation }: any) => {
                             <Text style={styles.text5}>Tổng giá bán</Text>
                         </View>
                         <View style={styles.view9}>
-                            <Text style={styles.text6}>2,500,000đ</Text>
+                            <Text style={styles.text6}>{totalPrice}đ</Text>
                         </View>
                     </View>
                     <TouchableOpacity onPress={(item) => navigation.navigate('TaoDonHang', { item })}>
@@ -189,6 +180,9 @@ const GioHng = ({ navigation }: any) => {
                     </TouchableOpacity>
                 </View>
             </View>
+
+
+
         </GestureHandlerRootView>
     );
 };

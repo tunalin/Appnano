@@ -1,18 +1,22 @@
-import React, { useState } from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { PanGestureHandler } from "react-native-gesture-handler";
+import React, { useEffect, useState } from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator } from "react-native";
+import { PanGestureHandler, PanGestureHandlerProps,PanGestureHandlerGestureEvent } from "react-native-gesture-handler";
 import Animated, { Extrapolate, interpolate, runOnJS, useAnimatedGestureHandler, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { deleteSp } from "../../Realm/realm";
+import { DetailSp } from "../FetchApi/StoreData";
 
-interface ListItemProps {
-    item: any; // Replace with the actual type of your cart item
-    onIncrement: (id: string) => void;
-    onDecrement: (id: string) => void;
-    onSelect: (id: string) => void;
+
+interface ListItemProps
+    extends Pick<PanGestureHandlerProps, 'simultaneousHandlers'> {
+    item: any;
+    onIncrement: (product_id: string) => void;
+    onDecrement: (product_id: string) => void;
+    onSelect: (product_id: string) => void;
     isSelected: boolean;
-    onDelete: (id: string) => void;
+    onDelete: (product_id: string) => void;
     onNavigate: () => void;
+    
 }
 
 const ListItem: React.FC<ListItemProps> = ({
@@ -23,63 +27,80 @@ const ListItem: React.FC<ListItemProps> = ({
     isSelected,
     onDelete,
     onNavigate,
+    simultaneousHandlers
 }) => {
+    const [productData, setProductData] = useState<any>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchData = async () => {
+        try {
+            const result = await DetailSp(item.product_id);
+            if (result) {
+                const products = result.data;
+                setProductData(products);
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+
+            setIsLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    const productID = item.product_id;
     const translateX = useSharedValue(0);
-
-
-    const gestureHandler = useAnimatedGestureHandler({
-        onStart: (_, ctx) => {
-            ctx.startX = translateX.value;
-        },
-        onActive: (event, ctx) => {
-            translateX.value = ctx.startX + event.translationX;
-            // Set delete button visibility based on swipe direction
-
+    const gestureHandler = useAnimatedGestureHandler<PanGestureHandlerGestureEvent>({
+     
+        onActive: (event, ) => {
+            translateX.value = event.translationX;
         },
         onEnd: (event,) => {
-            if ( translateX.value <= -320) {
-                runOnJS(onDelete)(item.id);
-            }
-            else {      // Not swiped far enough, animate back to the initial position
+            if (translateX.value <= -320) {
+                runOnJS(onDelete)(productID);
+            } else {
                 translateX.value = withSpring(0);
             }
         },
     });
-
     const animatedStyle = useAnimatedStyle(() => {
-
         const opacity = interpolate(
             translateX.value,
             [0, -320],
             [1, 0],
             Extrapolate.CLAMP
         )
-
         return {
             transform: [{ translateX: translateX.value }],
-            opacity:opacity
+            opacity: opacity
 
         };
     });
 
 
-    return (
-        <View style={{}}>
-            <View style={styles.deleteButtonContainer}>
-                <TouchableOpacity onPress={() => onDelete(item.id)}>
-                    <Animated.View style={styles.deleteButton}>
-                        <Image source={require("../../imgcart/thungrac.png")} />
-                    </Animated.View>
-                </TouchableOpacity>
-            </View>
-            <PanGestureHandler onGestureEvent={gestureHandler}>
-                <Animated.View style={[styles.container, animatedStyle]}>
+    
+    const price = parseFloat(productData.price);
+    const formattedPrice = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
 
+    return (
+        <PanGestureHandler simultaneousHandlers={simultaneousHandlers} onGestureEvent={gestureHandler}>
+            <Animated.View >
+                <Animated.View style={styles.deleteButtonContainer}>
+                    <TouchableOpacity onPress={() => onDelete(item.product_id)}>
+                        <Animated.View style={styles.deleteButton}>
+                            <Image source={require("../../imgcart/thungrac.png")} />
+                        </Animated.View>
+                    </TouchableOpacity>
+                </Animated.View>
+                <Animated.View style={[styles.container, animatedStyle]}>
                     <TouchableOpacity onPress={onNavigate}>
-                        <View style={styles.itemContainer}>
-                            <View style={styles.checkboxContainer}>
-                                <TouchableOpacity onPress={() => onSelect(item.id)}>
-                                    <View
+                        <Animated.View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <Animated.View style={styles.checkboxContainer} >
+                                <TouchableOpacity onPress={() => onSelect(item.product_id)}>
+                                    <Animated.View
                                         style={[
                                             styles.checkbox,
                                             {
@@ -92,55 +113,65 @@ const ListItem: React.FC<ListItemProps> = ({
                                                 source={require("../../imgcart/chon.png")}
                                                 style={styles.checkboxIcon} />
                                         )}
-                                    </View>
+                                    </Animated.View>
                                 </TouchableOpacity>
-                            </View>
-                            
-                            <View style={styles.imageContainer}>
-                                <Image source={item.hinh} style={styles.itemImage} />
-                            </View>
-                            <View style={styles.itemInfoContainer}>
-                                <Text style={styles.itemName}>{item.ten}</Text>
-                                <Text style={styles.itemPrice}>{item.gia}</Text>
-                            </View>
-                            <View style={styles.quantityContainer}>
-                                <TouchableOpacity onPress={() => onDecrement(item.id)}>
-                                    <View style={styles.quantityButton}>
-                                        <Text style={styles.quantityText}>-</Text>
-                                    </View>
-                                </TouchableOpacity>
-                                <View style={styles.quantityDisplay}>
-                                    <Text style={styles.quantityText}>{item.soluong}</Text>
-                                </View>
-                                <TouchableOpacity onPress={() => onIncrement(item.id)}>
-                                    <View style={styles.quantityButton}>
-                                        <Text style={styles.quantityText}>+</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        </View>
+                            </Animated.View>
+                            <Animated.View style={styles.itemContainer}>
+                                <Animated.View style={styles.imageContainer}>
+                                    {isLoading ? (
+                                        <ActivityIndicator size="large" color="#005aa9" />
+                                    ) : (
+                                        <Image source={{ uri: productData?.img_1 }} style={styles.itemImage} />
+                                    )}
+                                </Animated.View>
+                                <Animated.View style={styles.itemInfoContainer}>
+                                    <Text style={styles.itemName}>
+                                        {isLoading ? 'Loading...' : productData ? productData.product_name : ''}
+                                    </Text>
+                                    <Text style={styles.itemPrice}>
+                                        {isLoading ? '' : productData ? formattedPrice : ''}
+                                    </Text>
+                                </Animated.View>
+                                <Animated.View style={styles.quantityContainer}>
+                                    <TouchableOpacity onPress={() => onDecrement(item.product_id)}>
+                                        <Animated.View style={styles.quantityButton}>
+                                            <Text style={styles.quantityText}>-</Text>
+                                        </Animated.View>
+                                    </TouchableOpacity>
+                                    <Animated.View style={styles.quantityDisplay}>
+                                        <Text style={styles.quantityText}>{item.soluong}</Text>
+                                    </Animated.View>
+                                    <TouchableOpacity onPress={() => onIncrement(item.product_id)}>
+                                        <View style={styles.quantityButton}>
+                                            <Text style={styles.quantityText}>+</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                </Animated.View>
+                            </Animated.View>
+                        </Animated.View>
                     </TouchableOpacity>
-
                 </Animated.View>
-            </PanGestureHandler>
-        </View>
+            </Animated.View>
+        </PanGestureHandler>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         width: '90%',
-        paddingVertical: 25,
-        marginLeft: 15,
-        
+        marginTop: 15,
+
+
     },
     itemContainer: {
         flexDirection: "row",
         alignItems: "center",
         borderRadius: 7,
         borderWidth: 0.5,
-        height:90,
-        backgroundColor: '#fff'
+        height: 90,
+        width: '100%',
+        backgroundColor: '#fff',
+        marginLeft: 5,
 
     },
     checkboxContainer: {
@@ -149,21 +180,23 @@ const styles = StyleSheet.create({
         borderRadius: 11,
         borderColor: "#c2c2c2",
         borderWidth: 1,
-        alignItems: "center",
-        justifyContent: "center",
+
     },
     checkbox: {
-        width: 22,
-        height: 22,
+        width: 20,
+        height: 20,
         borderRadius: 11,
+        justifyContent: 'center',
+        alignItems: "center"
     },
     checkboxIcon: {
         width: 16,
         height: 16,
+
     },
     imageContainer: {
-        marginLeft: 10,
-
+        marginLeft: 15,
+        
     },
     itemImage: {
         width: 64,
@@ -177,7 +210,7 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: "500",
         color: "#000",
-        marginRight: 120,
+       
     },
     itemPrice: {
         fontSize: 16,

@@ -74,7 +74,7 @@ const App = () => {
                     <Stack.Screen name="danhsachnhom1" component={NPPhoi} options={{ headerShown: false }} />
                     <Stack.Screen name="home1" component={HomeKho} options={{ headerShown: false }} />
                     <Stack.Screen name="timkiem" component={Timkiem} options={{ headerShown: false }} />
-                    <Stack.Screen name = 'Account' component={Account} options={{headerShown:false}}/>
+                   
                 </Stack.Navigator>
             </NavigationContainer>
   

@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, ScrollView } from "react-native";
+import { Image, StyleSheet, Text, View, TouchableOpacity, FlatList, TextInput, ScrollView, ActivityIndicator } from "react-native";
 import { GestureHandlerRootView, PanGestureHandler, State } from "react-native-gesture-handler";
 import Animated, { Easing, Extrapolate, interpolate, useAnimatedGestureHandler, useAnimatedScrollHandler, useAnimatedStyle, useDerivedValue, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProductList, fetchApiData } from "../FetchApi/StoreData";
+import realmData from "../../Realm/dataRealm";
 
 
 
@@ -39,19 +40,41 @@ const HomeKho = ({ navigation }: any) => {
   const [sanpham, setsanpham] = useState<any>(1)
   const [spmoi, setspmoi] = useState([])
   const [bannerData, setbannerData] = useState([])
-
-  
+  const [page, setpage] = useState(1)
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const fetchProductList = async () => {
-    const product = await ProductList(1);
-    const respon = product.data.l
-    setsanpham(respon)
+    if (loadingMore) {
+      return;
+    }
 
+    try {
+      setLoadingMore(true);
+
+      const product = await ProductList(page);
+      const respon = product.data.l;
+      if (page === 1) {
+        setsanpham(respon);
+      } else {
+        // If it's a subsequent page, append the new data to the existing data
+        setsanpham((prevData: any) => [...prevData, ...respon]);
+      }
+      setpage(page + 1); // Increment the page for the next load
+    } catch (error) {
+      console.error("Error fetching product list:", error);
+    } finally {
+      setLoadingMore(false);
+    }
   }
 
+  const handleloadmore = () => {
+    fetchProductList();
+  }
+
+  // console.log(handleloadmore)
   const fetchBanner = async () => {
 
-    const banner = await ProductList(2);
+    const banner = await ProductList(page);
     const responData = banner.data.theme
 
     const sanPhamMoiData = responData.filter((item: any) => item.id === "52");
@@ -65,8 +88,6 @@ const HomeKho = ({ navigation }: any) => {
       const slideList = bannerItem.slide_list;
       // console.log(JSON.stringify(slideList));
       setbannerData(slideList)
-    } else {
-      console.log("Không tìm thấy dữ liệu cho id 253");
     }
   };
 
@@ -125,6 +146,21 @@ const HomeKho = ({ navigation }: any) => {
   const SEARCH_BAR_WIDTH = 320;
   const translateX = useSharedValue(0);
   const [searchBarVisible, setSearchBarVisible] = useState(true);
+  const [cartItems, setCartItems] = useState([]);
+
+  useEffect(() => {
+    const cartItemsFromRealm = realmData.objects("CartItem");
+    const updateCartItems = () => {
+      const cartItemsArray: any = Array.from(cartItemsFromRealm);
+      setCartItems(cartItemsArray);
+    };
+    const cartItemsListener = () => {
+      updateCartItems();
+    };
+    cartItemsFromRealm.addListener(cartItemsListener);
+  }, []);
+
+
   const handleScroll = (event: any) => {
     const offsetY = event.nativeEvent.contentOffset.y;
     const threshold = 160;
@@ -161,7 +197,7 @@ const HomeKho = ({ navigation }: any) => {
   });
 
   const styleCart = useAnimatedStyle(() => {
-    const cartX = scrollY.value <= 160 ? 0 : -280; // Di chuyển ngay khi người dùng cuộn
+    const cartX = scrollY.value <= 160 ? 0 : -280; 
     const cartY = interpolate(
       scrollY.value,
       [0, SEARCH_BAR_WIDTH],
@@ -182,9 +218,9 @@ const HomeKho = ({ navigation }: any) => {
         const nextPosition1 = (imagePosition1 + 1) % bannerData.length;
         setImagePosition1(nextPosition1);
         setactiveDotIndex1(nextPosition1);
-          flatListRef1.current.scrollToIndex({ index: nextPosition1 });
+        flatListRef1.current.scrollToIndex({ index: nextPosition1 });
       }, 3000);
-  
+
       return () => clearInterval(time);
     }
   }, [imagePosition1, bannerData]);
@@ -201,7 +237,8 @@ const HomeKho = ({ navigation }: any) => {
             backgroundColor: '#fff',
             width: isActive ? 10 : 7,
             height: isActive ? 10 : 7,
-            borderRadius: 5, marginHorizontal: 5
+            borderRadius: 5, marginHorizontal: 5,
+            marginVertical: 10
           }}
         >
         </View>
@@ -209,24 +246,7 @@ const HomeKho = ({ navigation }: any) => {
     })
   }
 
-  // const renderDot2 = () => {
-  //   return spmoi.map((dot, index) => {
-  //     const isActive = index === activeDotIndex2;
-  //     return (
-  //       <View
-  //         key={index}
-  //         style={{
-  //           backgroundColor: isActive ? '#005aa9' : '#D9D9D9',
-  //           width: isActive ? 10 : 7,
-  //           height: isActive ? 10 : 7,
-  //           borderRadius: 5, marginHorizontal: 3,
-  //           marginTop: 10,
-  //         }}
-  //       >
-  //       </View>
-  //     )
-  //   })
-  // }
+
   const renderImg = ({ item, index }: any) => {
 
     return (
@@ -238,6 +258,7 @@ const HomeKho = ({ navigation }: any) => {
             borderRadius: 7,
             width: 382,
             marginLeft: 15,
+
           }}
           source={{ uri: item.banner }}
         />
@@ -312,7 +333,7 @@ const HomeKho = ({ navigation }: any) => {
     return (
       <View>
         <FlatList
-          ref={flatListRef2}
+          // ref={flatListRef2}
           data={item.product_1_list}
           keyExtractor={(item) => item.product_id}
           renderItem={renderSpMF}
@@ -327,7 +348,7 @@ const HomeKho = ({ navigation }: any) => {
   const renderCateGory1 = ({ item, index }: any) => {
 
     return (
-      <View style={{ height: 90, justifyContent: 'center', alignItems: 'center', borderRadius: 15 }}>
+      <View style={{ width: 90, height: 90, justifyContent: 'center', alignItems: 'center', borderRadius: 15 }}>
         <Image source={{ uri: item.icon }} style={{ width: 50, height: 50 }} />
         <Text style={{ color: 'black' }}>{item.name}</Text>
       </View>
@@ -402,8 +423,16 @@ const HomeKho = ({ navigation }: any) => {
             </Animated.ScrollView>
           </Animated.View>
           <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
-            <Animated.Image source={require('../../img/cart20regular.png')}
-              style={[styles.cartIcon, styleCart]} />
+            <Animated.View style={styleCart}>
+              <Animated.Image
+                source={require('../../img/cart20regular.png')}
+                style={[styles.cartIcon]}
+              />
+              {cartItems.length > 0 && (
+                <View style={styles.redDot}></View>
+              )}
+            </Animated.View>
+
           </TouchableOpacity>
           <TouchableOpacity onPress={() => navigation.navigate('timkiem')}>
             <View>
@@ -425,7 +454,7 @@ const HomeKho = ({ navigation }: any) => {
             <FlatList
               ref={flatListRef1}
               data={bannerData}
-              keyExtractor={(item: any, index: any) => index}
+              keyExtractor={(item: any, index: any) => index.toString()}
               renderItem={renderImg}
               horizontal={true}
               showsHorizontalScrollIndicator={false}
@@ -504,7 +533,12 @@ const HomeKho = ({ navigation }: any) => {
               renderItem={renderSP}
               scrollEnabled={false}
               numColumns={2}
+              onEndReached={handleloadmore}
+              onEndReachedThreshold={0.1}
+              ListFooterComponent={() => {
 
+                return loadingMore ? <ActivityIndicator size="large" color="#005aa9" /> : null;
+              }}
             />
           </View>
         </Animated.ScrollView>
@@ -710,12 +744,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: '#000'
   },
-  expandedSearch: {
-
+  redDot: {
+    width: 10,
+    height: 10,
+    backgroundColor: 'red',
+    borderRadius: 5,
+    position: 'absolute',
+    bottom: 130,
+    left: 170,
   },
-  collapsedSearch: {
-
-  }
 });
 
 export default HomeKho

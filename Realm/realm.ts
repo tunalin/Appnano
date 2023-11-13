@@ -30,26 +30,30 @@ export const deletetask = (idToDelete: number) => {
   });
 };
 
-export const addToCart = (id: string, soluong: number, ten: string, gia: number) => {
-  const Data = {
-    id,
-    soluong,
-    ten,
-    gia,
-  }
+export const addToCart = (product_id: string, product_name: string, price: number, soluong: number) => {
+  const existingCartItem: any = realmData.objects('CartItem').filtered(`product_id = '${product_id}'`)[0];
   return new Promise((resolve: any) => {
     realmData.write(() => {
-      // Tạo mới sản phẩm trong giỏ hàng nếu chưa tồn tại.
-      realmData.create('CartItem', Data)
+      if (existingCartItem) {
+        // Update the existing object
+        existingCartItem.soluong += soluong;
+      } else {
+        // Create a new object
+        realmData.create('CartItem', {
+          product_id,
+          product_name,
+          price,
+          soluong,
+        });
+      }
       resolve();
-    })
-
+    });
   });
 };
 
-export const updateSp = (id: string, soluong: number) => {
+export const updateSp = (product_id: string, soluong: number) => {
   if (realmData) {
-    const taskToUpdate: any = realmData.objects('CartItem').filtered(`id = '${id}'`)[0];
+    const taskToUpdate: any = realmData.objects('CartItem').filtered(`product_id = '${product_id}'`)[0];
     if (taskToUpdate) {
       realmData.write(() => {
         taskToUpdate.soluong = soluong
@@ -59,17 +63,26 @@ export const updateSp = (id: string, soluong: number) => {
   }
 };
 
-export const deleteSp = (id: string) => {
+export const deleteSp = (product_id: string) => {
   return new Promise((resolve, reject) => {
     realmData.write(() => {
-      const itemToDelete = realmData.objectForPrimaryKey('CartItem', id);
+      const itemToDelete = realmData.objectForPrimaryKey('CartItem', product_id);
       if (itemToDelete) {
         realmData.delete(itemToDelete);
-        resolve('Deleted successfully'); // Trả về một chuỗi (string) để xác nhận việc xóa thành công
+        resolve('Deleted successfully'); 
       } else {
-        reject('Item not found'); // Trả về một chuỗi (string) để xác nhận lỗi
+        reject('Item not found'); 
       }
     });
   });
 };
 
+export const deleteAllHistory = () => {
+  return new Promise((resolve: any) => {
+    const historySearchResults = realmData.objects('historySearch');
+    realmData.write(() => {
+      realmData.delete(historySearchResults);
+    });
+    resolve();
+  });
+}

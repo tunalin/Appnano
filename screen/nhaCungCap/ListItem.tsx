@@ -5,53 +5,59 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
 } from 'react-native-reanimated';
+import { index } from 'realm';
 
 type ListItemProps = {
-  item: {
-    id: string;
-    hinh: any;
-    ten: string;
-    noidung: string;
-    soluong: string;
-    tp: string;
-  };
+  supplierData:{
+    id:any,
+    logo:any,
+    name:any,
+    short_description:any,
+    total_product:any,
+    city:any,
+  } 
+  index: any
   viewableItems: Animated.SharedValue<ViewToken[]>;
+
 };
 
-const ListItem: React.FC<ListItemProps> = ({ item, viewableItems }) => {
+
+const ListItem: React.FC<ListItemProps> = ({ index, supplierData, viewableItems }) => {
   const rStyle = useAnimatedStyle(() => {
     const isVisible = Boolean(
-      viewableItems.value.find(
-        (viewableItem) => viewableItem.item.id === item.id
-      )
+      viewableItems.value
+      .filter((supplierData) => supplierData.isViewable)
+      .find((viewableItem) => viewableItem.item.id === supplierData.id)
     );
-
     return {
       opacity: withTiming(isVisible ? 1 : 0),
       transform: [
         {
-          scale: withTiming(isVisible ? 1 : 0.6),
+          scale: withTiming(isVisible ? 1 :0.6),
         },
       ],
     };
-  }, [viewableItems, item]);
+  }, [viewableItems, supplierData]);
+
 
   return (
     <Animated.View style={[styles.view, rStyle]}>
       <TouchableOpacity>
-        <View style={styles.top}>
-          <Image source={item.hinh} style={styles.img} />
+        <Animated.View style={[styles.top]}>
+          {supplierData.logo ? (
+            <Image source={{ uri: supplierData.logo }} style={styles.img} />
+          ) : <Image source={require('../../img/hinhmauxam.png')} style={styles.img} />}
           <View style={styles.view1}>
             <View style={styles.view2}>
-              <Text style={styles.text}>{item.ten}</Text>
-              <Text style={styles.text1}>{item.noidung}</Text>
+              <Text style={styles.text}>{supplierData.name}</Text>
+              <Text style={styles.text1}>{supplierData.short_description}</Text>
             </View>
             <View style={styles.view3}>
-              <Text style={styles.text2}>{item.soluong}</Text>
-              <Text style={styles.text3}>{item.tp}</Text>
+              <Text style={styles.text2}>{supplierData.total_product} Sản phẩm</Text>
+              <Text style={styles.text3}>{supplierData.city}</Text>
             </View>
           </View>
-        </View>
+        </Animated.View>
       </TouchableOpacity>
     </Animated.View>
   );
@@ -66,7 +72,7 @@ const styles = StyleSheet.create({
     width: 365,
     paddingVertical: 5,
     margin: 11,
-    backgroundColor: 'pink',
+
   },
   top: {
     flexDirection: 'row',

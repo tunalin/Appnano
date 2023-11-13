@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, FlatList, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, FlatList, ScrollView, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { addTask, deletetask, addToCart } from '../../Realm/realm';
+import { addTask, deletetask, addToCart, deleteAllHistory } from '../../Realm/realm';
 import realmData from '../../Realm/dataRealm';
-import { DataTong } from '../DATASanPham/DataTong';
 import LottieView from "lottie-react-native";
 import Animated, {
     Easing,
@@ -12,68 +11,92 @@ import Animated, {
     useSharedValue,
     withSpring,
 } from 'react-native-reanimated';
-
-const addSP = realmData.objects('CartItem')
+import { ProductList } from '../FetchApi/StoreData';
+import unorm from 'unorm';
+import Notification from './Notification';
+// const addSP = realmData.objects('CartItem')
 
 const Timkiem = ({ navigation }: any) => {
     const [searchKeyword, setSearchKeyword] = useState("");
     const [searchHistory, setSearchHistory] = useState<Realm.Results<Realm.Object & { id: number; name: string }>>();
     const [searchResults, setSearchResults] = useState<any[]>([]);
-    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+    const [page, setPage] = useState(1);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [allSearchResults, setAllSearchResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+    const [showNotification, setShowNotification] = useState(false);
+
+    const fetchData = async () => {
+        if (loadingMore) {
+            return;
+        }
+        setLoadingMore(true);
+        try {
+            const result = await ProductList(page);
+            if (result) {
+                const products = result.data.l;
+                if (products.length > 0) {
+                    setAllSearchResults((prevData) => [...prevData, ...products]);
+                    setPage(page + 1);
+                }
+            }
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        } finally {
+            setLoadingMore(false);
+        }
+    };
 
     useEffect(() => {
-        // Define your event handler function
+        fetchData();
+    }, []);
+
+    const handleEndReached = () => {
+        fetchData();
+    };
+    useEffect(() => {
         const handleDataUpdate = () => {
             const dataFromRealm: any = realmData.objects('historySearch');
             setSearchHistory(dataFromRealm);
         };
-
-        // Add the event listener to your emitter
         realmData.addListener('change', handleDataUpdate);
-
-        // Call your initial data update
         handleDataUpdate();
-
-        // Clean up the listener when the component unmounts
         return () => {
-            // Remove the event listener
             realmData.removeListener('change', handleDataUpdate);
         };
     }, []);
 
+
+
     const handleSearch = () => {
-        // Thêm từ khóa tìm kiếm vào Realm
-        addTask(searchKeyword)
-            .then(() => {
-                // Sau khi thêm dữ liệu vào Realm, lấy lại dữ liệu từ Realm để hiển thị lịch sử tìm kiếm
-                const dataFromRealm: any = realmData.objects('historySearch');
-
-                // Đảo ngược mảng để đảm bảo mục mới nhất sẽ hiển thị ở đầu
-                setSearchHistory(dataFromRealm.slice().reverse());
-
-                const results = DataTong.filter(item => item.ten.toLowerCase().includes(searchKeyword.toLowerCase()));
-                setSearchResults(results);
-            })
-            .catch(error => {
-                console.error("Lỗi khi thêm dữ liệu vào Realm:", error);
-            });
+        if (searchKeyword.trim() !== "") {
+            addTask(searchKeyword)
+            searchProduct(searchKeyword)
+            setIsSearching(true);
+        }
     }
+
+    const searchProduct = (keyword: string) => {
+        const normalizedKeyword = unorm.nfkd(keyword).replace(/[\u0300-\u036f]/g, '');
+        const results = [];
+        for (const dataItem of allSearchResults) {
+            if (dataItem.product_name) {
+                const normalizedProductName = unorm.nfkd(dataItem.product_name).replace(/[\u0300-\u036f]/g, '');
+                if (normalizedProductName.toLowerCase().includes(normalizedKeyword.toLowerCase())) {
+                    results.push(dataItem);
+                }
+            }
+        }
+        setSearchResults(results);
+    };
 
     const handleDelete = (idToDelete: number) => {
-        // Xóa mục khỏi Realm khi người dùng nhấn vào hình dauX.png
         deletetask(idToDelete)
-            .then(() => {
-                // Sau khi xóa dữ liệu từ Realm, cập nhật lại danh sách lịch sử tìm kiếm
-                const dataFromRealm: any = realmData.objects('historySearch');
-                setSearchHistory(dataFromRealm);
-            })
-            .catch(error => {
-                console.error("Lỗi khi xóa dữ liệu từ Realm:", error);
-            });
     }
-
+    const handleDeleteAllHistory = () => {
+        deleteAllHistory();
+    }
     const showConfirmation = useSharedValue(0);
-
     const rStyle = useAnimatedStyle(() => {
         const hideNofi = interpolate(
             showConfirmation.value,
@@ -83,152 +106,156 @@ const Timkiem = ({ navigation }: any) => {
         )
         return {
             opacity: hideNofi,
-
         };
     });
 
-
     const renderSP = ({ item }: any) => {
         const handleAddToCart = () => {
-            const existingCartItem: any = addSP.filtered(`id == '${item.id}'`)[0]
-            if (existingCartItem) {
-                realmData.write(() => {
-                    existingCartItem.soluong += 1
-                    console.log("kiem tra", addSP)
-                })
-            } else {
-                addToCart(item.id, 1, item.ten, item.gia)
-
-            }
-
-            setShowSuccessMessage(true);
-            showConfirmation.value = withSpring(1, {
-                duration: 2000
-            }, () => {
-                showConfirmation.value = withSpring(0)
+            addToCart(item.product_id, item.product_name, price, 1).then(() => {
+                setShowNotification(true);
+                setTimeout(() => {
+                    setShowNotification(false);
+                }, 1000);
             });
-            setTimeout(() => {
-                setShowSuccessMessage(false);
-            }, 2000);
         };
+        const price = parseFloat(item.price);
+        const formattedPrice = price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
         return (
-
-            <View style={{ width: 183, height: 260, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3, marginTop: 15 }}>
-                <Image source={item.hinh}
+            <TouchableOpacity
+                style={{ width: 183, height: 260, borderRadius: 7, elevation: 6, backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', marginHorizontal: 7, borderWidth: 0.3, marginTop: 15 }}
+                onPress={() => {
+                    navigation.navigate('Detail', { item });
+                }}
+            >
+                <Image source={{ uri: item.img_1 }}
                     style={{ width: 131, height: 112, marginTop: 20 }} />
-                <View style={{}}>
-                    <View style={{ height: 70 }}>
-                        <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>{item.ten}</Text>
-                    </View>
-
-                    <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.ma}</Text>
+                <View style={{ height: 70 }}>
+                    <Text style={{ fontSize: 16, fontWeight: "500", color: '#005aa9' }}>
+                        <Text >
+                            {item.product_name.length > 20
+                                ? item.product_name.slice(0, 20) + '...'
+                                : item.product_name}
+                        </Text>
+                    </Text>
+                    <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.unique_id}</Text>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.gia}</Text>
-                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{item.sogia}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Giá bán: </Text>
+                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#005aa9' }}>{formattedPrice}</Text>
                     </View>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>{item.hoa}</Text>
-                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.sohoa}</Text>
+                        <Text style={{ fontSize: 13, fontWeight: "400", color: '#8b8787' }}>Hoa hồng:</Text>
+                        <Text style={{ fontSize: 13, fontWeight: "500", color: '#19a538' }}>{item.for_point}</Text>
                     </View>
-
                 </View>
                 <TouchableOpacity onPress={handleAddToCart}>
-                    <View style={{ borderWidth: 1, borderRadius: 100, height: 25, width: 25, alignItems: 'center', backgroundColor: '#000', marginLeft: 150, bottom: 15 }}>
+                    <View style={{ borderWidth: 1, borderRadius: 100, height: 25, width: 25, alignItems: 'center', backgroundColor: '#000', marginLeft: 150, marginTop: 25 }}>
                         <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>+</Text>
                     </View>
                 </TouchableOpacity>
-            </View>
-
+            </TouchableOpacity>
 
         )
+
     }
 
     return (
-
         <View style={styles.container}>
-
             <View style={styles.top}>
                 <TouchableOpacity onPress={() => navigation.navigate('home')}>
                     <Image source={require('../../imgcart/back.png')} style={{ width: 20 }} />
                 </TouchableOpacity>
-
                 <Text style={styles.text}>Tìm kiếm</Text>
+
                 <TouchableOpacity onPress={() => navigation.navigate('Cart')}>
                     <Image source={require('../../img/Vector_cart.png')} />
                 </TouchableOpacity>
-
             </View>
-
             <View style={styles.boxsearch}>
                 <View style={styles.flexboxsearch}>
                     <TextInput
+                        value={searchKeyword}
                         onChangeText={(text) => setSearchKeyword(text)}
                         placeholder="Bạn cần tìm gì?"
                         style={{ fontSize: 16, fontWeight: "400", color: '#000' }}
                     />
-                    <TouchableOpacity onPress={handleSearch}>
+                    <TouchableOpacity onPress={() => {
+                        handleSearch();
+
+                    }}>
                         <Image
                             source={require("../../img/ei_search.png")}
                             style={styles.searchIcon}
                         />
                     </TouchableOpacity>
-
                 </View>
-
-
-
             </View>
-
             <ScrollView>
-                <Text style={styles.text1}>Đã tìm gần đây</Text>
+                {searchKeyword ? (
+                    <View>
+                        <View style={{ flexDirection: "row", justifyContent: 'space-between', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 10 }}>
+                            <Text style={styles.text1}>Đã tìm gần đây</Text>
+                            <TouchableOpacity onPress={handleDeleteAllHistory}>
+                                <Text style={{ fontSize: 15, fontWeight: '400', color: 'red' }}>Clear History</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                <View style={{ width: '100%' }}>
-
-                    <FlatList
-                        data={searchHistory?.slice(0, 3)}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <View style={styles.boxSanpham}>
-                                <Text style={styles.textSp}>{item.name}</Text>
-                                <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                                    <Image source={require('../../imgcart/dauX.png')} style={{ width: 20, height: 20 }} />
-                                </TouchableOpacity>
-                            </View>
-                        )}
-                        scrollEnabled={false}
-                    />
-
-
-                </View>
+                        <View style={{ width: '100%' }}>
+                            <FlatList
+                                data={searchHistory?.slice(0, 3)}
+                                keyExtractor={(item) => item.id.toString()}
+                                renderItem={({ item }) => (
+                                    <View style={styles.boxSanpham}>
+                                        <Text style={styles.textSp}>{item.name}</Text>
+                                        <TouchableOpacity onPress={() => {
+                                            handleDelete(item.id);
+                                            setSearchResults([]);
+                                        }}>
+                                            <Image source={require('../../imgcart/dauX.png')} style={{ width: 20, height: 20 }} />
+                                        </TouchableOpacity>
+                                    </View>
+                                )}
+                                scrollEnabled={false}
+                            />
+                        </View>
+                    </View>
+                ) : null}
                 <View style={{ flex: 1, marginLeft: 10 }}>
-
                     <Text style={styles.text1}>Các kết quả tương ứng</Text>
-                    <FlatList
-                        data={searchResults}
-                        keyExtractor={(item) => item.id}
-                        renderItem={renderSP}
-                        showsVerticalScrollIndicator={false}
-                        numColumns={2}
-                        scrollEnabled={false}
-                    />
+                    {isSearching ? (
+                        <FlatList
+                            data={searchResults}
+                            keyExtractor={(item) => item.product_id}
+                            renderItem={renderSP}
+                            showsVerticalScrollIndicator={false}
+                            numColumns={2}
+                            scrollEnabled={false}
+                            onEndReached={handleEndReached}
+                            onEndReachedThreshold={0.1}
+                            ListFooterComponent={() => {
+                                return loadingMore ? <ActivityIndicator size="large" color="#005aa9" /> : null;
+                            }}
+                        />
+                    ) : (
+                        <FlatList
+                            data={allSearchResults}
+                            keyExtractor={(item) => item.product_id}
+                            renderItem={renderSP}
+                            showsVerticalScrollIndicator={false}
+                            numColumns={2}
+                            scrollEnabled={false}
+                            onEndReached={handleEndReached}
+                            onEndReachedThreshold={0.1}
+                            ListFooterComponent={() => {
+                                return loadingMore ? <ActivityIndicator size="large" color="#005aa9" /> : null;
+                            }}
+                        />)}
                 </View>
-
             </ScrollView>
-            {showSuccessMessage && (
-                <Animated.View
-                    style={[
-                        styles.successMessage,
-                        rStyle
-                    ]}
-                >
-                    <LottieView
-                        source={require('../../asset/checkload.json')}
-                        style={{ width: 40, height: 40 }}
-                        autoPlay
-                    />
-                    <Text style={styles.successMessageText}>Đã thêm vào giỏ hàng</Text>
-                </Animated.View>
-            )}
+            <Notification
+                isVisible={showNotification}
+                animationSource={require('../../asset/checkload.json')}
+                onClose={() => setShowNotification(false)}
+            />
         </View>
     )
 }
@@ -274,8 +301,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '500',
         color: '#000',
-        marginTop: 20,
-        marginLeft: 15
+
     },
     boxSanpham: {
         width: 360,

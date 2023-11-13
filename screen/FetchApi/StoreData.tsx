@@ -44,22 +44,55 @@ export const loginUser = async (username: any, password: any, navigation: { navi
     }
 };
 
-export async function ProductList(page: any) {
+export async function ProductList(page: number) {
     const formData = new FormData();
     formData.append('page', page);
     formData.append('for_point', 0);
-    
+
     try {
         const savedDomain = await AsyncStorage.getItem('mainDomain');
         const savedApiKeyClient = await AsyncStorage.getItem('apiK');
-
         if (savedDomain && savedApiKeyClient) {
-
-           
-            const response = await axios.post(`${savedDomain}/client_product/list_all?apikey=${savedApiKeyClient}`,formData);
-            // console.log(response.data.data.l)
+            const response = await axios.post(`${savedDomain}/client_product/list_all?apikey=${savedApiKeyClient}`, formData);
             return response.data;
-            
+        } else {
+            console.log('Không tìm thấy domain hoặc apiKeyClient trong AsyncStorage.');
+            return null;
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+        return null;
+    }
+}
+
+export async function DetailSp(id: any) {
+    const formData = new FormData();
+    formData.append('id', id)
+
+    try {
+        const savedDomain = await AsyncStorage.getItem('mainDomain');
+        const savedApiKeyClient = await AsyncStorage.getItem('apiK');
+        if (savedDomain && savedApiKeyClient) {
+            const response = await axios.post(`${savedDomain}/client_product/detail?apikey=${savedApiKeyClient}`, formData);
+            return response.data;
+        } else {
+            console.log('Không tìm thấy domain hoặc apiKeyClient trong AsyncStorage.');
+            return null;
+        }
+    } catch (error) {
+        console.error('Lỗi khi lấy danh sách sản phẩm:', error);
+        return null;
+    }
+}
+
+export default async function Provider() {
+ 
+    try {
+        const savedDomain = await AsyncStorage.getItem('mainDomain');
+        const savedApiKeyClient = await AsyncStorage.getItem('apiK');
+        if (savedDomain && savedApiKeyClient) {
+            const response = await axios.post(`${savedDomain}/supplier_tab/list_all?apikey=${savedApiKeyClient}`);
+            return response.data;
         } else {
             console.log('Không tìm thấy domain hoặc apiKeyClient trong AsyncStorage.');
             return null;

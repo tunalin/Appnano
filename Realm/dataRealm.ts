@@ -12,11 +12,11 @@ import Realm from "realm";
 
   const CartItemSchema = {
     name: 'CartItem',
-    primaryKey: 'id',
+    primaryKey: 'product_id',
     properties: {
-      id: 'string',
-      ten: 'string',
-      gia: 'string',
+      product_id: 'string',
+      product_name: 'string',
+      price: 'double',
       soluong: 'int',
     },
   };

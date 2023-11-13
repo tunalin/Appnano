@@ -140,7 +140,6 @@ const Account = ({ navigation }: any) => {
                 </View>
                 <View style={styles.view11}>
                     <View style={{bottom:15}}>
-
                         <FlatList
                             data={data2}
                             keyExtractor={(item) => item.id}
